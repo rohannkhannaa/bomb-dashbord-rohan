@@ -1,10 +1,9 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import styled from 'styled-components';
 import Page from '../../components/Page';
 import { createGlobalStyle } from 'styled-components';
 import moment from 'moment';
-
-import CountUp from 'react-countup';
-import CardIcon from '../../components/CardIcon';
+import { getDisplayBalance } from '../../utils/formatBalance';
 import TokenSymbol from '../../components/TokenSymbol';
 import useBombStats from '../../hooks/useBombStats';
 import useLpStats from '../../hooks/useLpStats';
@@ -16,25 +15,47 @@ import useBombFinance from '../../hooks/useBombFinance'; // Imported bombFinance
 import usebShareStats from '../../hooks/usebShareStats';
 import useTotalValueLocked from '../../hooks/useTotalValueLocked';
 import useTreasuryAllocationTimes from '../../hooks/useTreasuryAllocationTimes';
+import { useWallet } from 'use-wallet';
+import UnlockWallet from '../../components/UnlockWallet';
+import useFetchBoardroomAPR from '../../hooks/useFetchBoardroomAPR';
 
 // import { Bomb as bombTesting } from '../../bomb-finance/deployments/deployments.testing.json';
 //import { Bomb as bombProd } from '../../bomb-finance/deployments/deployments.mainnet.json';
+import useTotalStakedOnBoardroom from '../../hooks/useTotalStakedOnBoardroom';
 import { roundAndFormatNumber } from '../../0x';
-import MetamaskFox from '../../assets/img/metamask-fox.svg';
 import { Box, Button, Card, CardContent, Grid, Paper } from '@material-ui/core';
 import ZapModal from '../Bank/components/ZapModal';
-import { Alert } from '@material-ui/lab';
-import { IoCloseOutline } from 'react-icons/io5';
-import { BiLoaderAlt } from 'react-icons/bi';
 import { makeStyles } from '@material-ui/core/styles';
 //import { ReactComponent as IconTelegram } from '../../assets/img/telegram.svg';
 import { Helmet } from 'react-helmet';
-import Boardroom from '../Boardroom/Boardroom';
 //import useBombMaxiStats from '../../hooks/useBombMaxiStats';
 import useCurrentEpoch from '../../hooks/useCurrentEpoch';
 import ProgressCountdown from './components/ProgressCountdown';
 
 import HomeImage from '../../assets/img/background.jpg';
+
+import DepositModal from './components/DepositModal';
+import WithdrawModal from './components/WithdrawModal';
+import useStakedBalanceOnBoardroom from '../../hooks/useStakedBalanceOnBoardroom';
+import useStakedTokenPriceInDollars from '../../hooks/useStakedTokenPriceInDollars';
+import useUnstakeTimerBoardroom from '../../hooks/boardroom/useUnstakeTimerBoardroom';
+import useStakeToBoardroom from '../../hooks/useStakeToBoardroom';
+import useWithdrawFromBoardroom from '../../hooks/useWithdrawFromBoardroom';
+import { AddIcon, RemoveIcon } from '../../components/icons';
+import IconButton from '../../components/IconButton';
+import useApprove, { ApprovalState } from '../../hooks/useApprove';
+import useTokenBalance from '../../hooks/useTokenBalance';
+import useWithdrawCheck from '../../hooks/boardroom/useWithdrawCheck';
+import Label from '../../components/Label';
+import Value from '../../components/Value';
+import useRedeemOnBoardroom from '../../hooks/useRedeemOnBoardroom';
+
+import CardIcon from '../../components/CardIcon';
+import useClaimRewardTimerBoardroom from '../../hooks/boardroom/useClaimRewardTimerBoardroom';
+import useClaimRewardCheck from '../../hooks/boardroom/useClaimRewardCheck';
+import useHarvestFromBoardroom from '../../hooks/useHarvestFromBoardroom';
+import useEarningsOnBoardroom from '../../hooks/useEarningsOnBoardroom';
+
 const BackgroundImage = createGlobalStyle`
   body { 
     background: url(${HomeImage}) repeat !important;
@@ -59,18 +80,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Home = () => {  
-  const { to } = useTreasuryAllocationTimes();
-  const classes = useStyles();
-  const TVL = useTotalValueLocked();
+const Home = () => {
   const bombFtmLpStats = useLpStatsBTC('BOMB-BTCB-LP');
   const bShareFtmLpStats = useLpStats('BSHARE-BNB-LP');
   const bombStats = useBombStats();
   const bShareStats = usebShareStats();
   const tBondStats = useBondStats();
-  const bombFinance = useBombFinance();
-  const currentEpoch = useCurrentEpoch();
-
   // const bombmaxi = useBombMaxiStats('0xd6f52e8ab206e59a1e13b3d6c5b7f31e90ef46ef000200000000000000000028');
 
   // console.log(bombmaxi);
@@ -181,6 +196,65 @@ const Home = () => {
   //   </grid>,
   // );
 
+  // For Bomb Finance Summary
+  const currentEpoch = useCurrentEpoch();
+
+  // For BOARD ROOM on dashboard
+  const totalStaked = useTotalStakedOnBoardroom();
+  const { account } = useWallet();
+  const bombFinance = useBombFinance();
+  const [approveStatus, approve] = useApprove(bombFinance.BSHARE, bombFinance.contracts.Boardroom.address);
+  const tokenBalance = useTokenBalance(bombFinance.BSHARE);
+  const stakedBalance = useStakedBalanceOnBoardroom();
+  const { from1, to1 } = useUnstakeTimerBoardroom();
+  const stakedTokenPriceInDollars = useStakedTokenPriceInDollars('BSHARE', bombFinance.BSHARE);
+  const tokenPriceInDollars = useMemo(
+    () =>
+      stakedTokenPriceInDollars
+        ? (Number(stakedTokenPriceInDollars) * Number(getDisplayBalance(stakedBalance))).toFixed(2).toString()
+        : null,
+    [stakedTokenPriceInDollars, stakedBalance],
+  );
+
+  const { to } = useTreasuryAllocationTimes();
+
+  const { onReward } = useHarvestFromBoardroom();
+  const earnings = useEarningsOnBoardroom();
+  const canClaimReward = useClaimRewardCheck();
+
+  const earnedInDollars = (Number(tokenPriceInDollars) * Number(getDisplayBalance(earnings))).toFixed(2);
+  const { from2, to2 } = useClaimRewardTimerBoardroom();
+  // const isOldBoardroomMember = boardroomVersion !== 'latest';
+  const canWithdraw = useWithdrawCheck();
+  const { onRedeem } = useRedeemOnBoardroom();
+
+  const { onStake } = useStakeToBoardroom();
+  const { onWithdraw } = useWithdrawFromBoardroom();
+  const canWithdrawFromBoardroom = useWithdrawCheck();
+
+  const [onPresentDeposit, onDismissDeposit] = useModal(
+    <DepositModal
+      max={tokenBalance}
+      onConfirm={(value) => {
+        onStake(value);
+        onDismissDeposit();
+      }}
+      tokenName={'BShare'}
+    />,
+  );
+
+  const [onPresentWithdraw, onDismissWithdraw] = useModal(
+    <WithdrawModal
+      max={stakedBalance}
+      onConfirm={(value) => {
+        onWithdraw(value);
+        onDismissWithdraw();
+      }}
+      tokenName={'BShare'}
+    />,
+  );
+  const boardroomAPR = useFetchBoardroomAPR();
+
   return (
     <Page>
       <Helmet>
@@ -196,7 +270,6 @@ const Home = () => {
           style={{ display: 'flex', justifyContent: 'center', verticalAlign: 'middle', overflow: 'hidden' }}
         ></Grid>
         {/* Explanation text */}
-
         {/* TVL */}
         <Grid item xs={12} sm={13}>
           <Card>
@@ -214,7 +287,10 @@ const Home = () => {
                     </thead>
                     <tbody>
                       <tr>
-                        <td><TokenSymbol symbol="BOMB"/>$BOMB</td>
+                        <td>
+                          <TokenSymbol symbol="BOMB" />
+                          $BOMB
+                        </td>
                         <td>${roundAndFormatNumber(bombCirculatingSupply * bombPriceInDollars, 2)}</td>
                         <td>{roundAndFormatNumber(bombCirculatingSupply, 2)}</td>
                         <td>{roundAndFormatNumber(bombTotalSupply, 2)}</td>
@@ -241,21 +317,21 @@ const Home = () => {
                 </div>
                 <div class="right">
                   <p>Current EPOCH : {Number(currentEpoch)} </p>
-                  <hr/>
-                  <p>Next EPOCH in : 
-                  <ProgressCountdown base={moment().toDate()} hideBar={true} deadline={to} description="Next Epoch" />
+                  <hr />
+                  <p>
+                    Next EPOCH in :
+                    <ProgressCountdown base={moment().toDate()} hideBar={true} deadline={to} description="Next Epoch" />
                   </p>
-                  <hr/>
+                  <hr />
                   <p>Live TWAP: </p>
                   <p>TVL: </p>
                   <p>Last Epoch TWAP: </p>
                 </div>
               </div>
             </CardContent>
-          </Card> 
+          </Card>
         </Grid>
 
-        {/* BOMB */}
         <Grid item xs={12} sm={4}>
           <Card>
             <CardContent align="center" style={{ position: 'relative' }}>
@@ -266,34 +342,93 @@ const Home = () => {
           </Card>
         </Grid>
 
+        {/* Details only shown after account Login, else user asked to connect wallet first */}
+        {!!account ? (
+          <Grid item xs={12} sm={12}>
+            <Card>
+              <CardContent align="center" style={{ position: 'relative' }}>
+                <div style={{ display: 'flex' }}>
+                  <div class="left">
+                    <TokenSymbol symbol="BSHARE" />
+                  </div>
+                  <div class="right">
+                    <h3>Board room</h3>
+                    <p>Stake BSHARE and earn BOMB every epoch</p>
+                    {/*  yha rehta */}
+                    <p>TVL :</p>
+                    <p>Total staked: {getDisplayBalance(totalStaked)}</p>
+                    <hr />
+                    <p>Daily returns :</p>
+                    {boardroomAPR.toFixed(2) / 365}%
+                    <p>
+                      Your stake :
+                      <Value value={getDisplayBalance(stakedBalance)} />
+                      <Label text={`≈ $${tokenPriceInDollars}`} variant="yellow" />
+                      <Label text={'BSHARE Staked'} variant="yellow" />
+                    </p>
+                    <p>
+                      Earned :
+                      <Value value={getDisplayBalance(earnings)} />
+                      <Label text={`≈ $${earnedInDollars}`} variant="yellow" />
+                      <Label text="BOMB Earned" variant="yellow" />
+                    </p>
+                    <div class="Deposit">
+                      {approveStatus !== ApprovalState.APPROVED ? (
+                        <Button
+                          disabled={approveStatus !== ApprovalState.NOT_APPROVED}
+                          className={
+                            approveStatus === ApprovalState.NOT_APPROVED ? 'shinyButton' : 'shinyButtonDisabled'
+                          }
+                          style={{ marginTop: '20px' }}
+                          onClick={approve}
+                        >
+                          Deposit
+                        </Button>
+                      ) : (
+                        <>
+                          <IconButton disabled={!canWithdrawFromBoardroom} onClick={onPresentWithdraw}>
+                            <RemoveIcon color={!canWithdrawFromBoardroom ? '' : 'yellow'} />
+                          </IconButton>
+                          <StyledActionSpacer />
+                          <IconButton onClick={onPresentDeposit}>
+                            <AddIcon color={!canWithdrawFromBoardroom ? '' : 'yellow'} />
+                          </IconButton>
+                        </>
+                      )}
+                    </div>
+                    <div className="withdraw">
+                      <Button
+                        disabled={stakedBalance.eq(0) || (!canWithdraw && !canClaimReward)}
+                        onClick={onRedeem}
+                        className={
+                          stakedBalance.eq(0) || (!canWithdraw && !canClaimReward)
+                            ? 'shinyButtonDisabledSecondary'
+                            : 'shinyButtonSecondary'
+                        }
+                      >
+                        Withdraw
+                      </Button>
+                    </div>
+                    <div className="claim">
+                      <Button
+                        onClick={onReward}
+                        className={earnings.eq(0) || !canClaimReward ? 'shinyButtonDisabled' : 'shinyButton'}
+                        disabled={earnings.eq(0) || !canClaimReward}
+                      >
+                        Claim Reward
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                <hr />
+              </CardContent>
+            </Card>
+          </Grid>
+        ) : (
+          <UnlockWallet />
+        )}
+
         {/* BSHARE */}
-        <Grid item xs={12} sm={12}>
-          <Card>
-            <CardContent align="center" style={{ position: 'relative' }}>
-              <div style={{ display: 'flex' }}>
-                <div class="left">
-                  <TokenSymbol symbol="BSHARE" />
-                </div>
-                <div class="right">
-                  <h3>Board room</h3>
-                  <p>Stake BSHARE and earn BOMB every epoch</p>
-                  {/*  yha rehta */}
-                  <p>TVL :</p>
-                  <p>Daily returns :</p>
-                  <p>Total staked :</p>
-                  <p>Daily returns :</p>
-                  <p>Earned :</p>
-                  <p>Total staked :</p>
-                  <p>Total staked :</p>
-                  <Button>Deposit</Button>
-                  <Button>Withdraw</Button>
-                  <Button>Claim rewards</Button>
-                </div>
-              </div>
-              <hr />
-            </CardContent>
-          </Card>
-        </Grid>
 
         <Grid item xs={12} sm={12}>
           <Card>
@@ -307,55 +442,48 @@ const Home = () => {
                   <p>Stake your LP tokens in our farms to start earning $BSHARE</p>
                   <Button>Claim all</Button>
                   {/*  yha rehta */}
+                  <hr />
                   <div style={{ display: 'flex' }}>
-                <div class="left">
-                  <TokenSymbol symbol="BSHARE" />
-                </div>
-                <div class="right">
-                  <h5>BOMB-BTCB</h5>
-                  <p>Recommended</p>
-                  {/*  yha rehta */}
-                  <p>TVL :</p>
-                  <p>Daily returns :</p>
-                  <p>Total staked :</p>
-                  <p>Daily returns :</p>
-                  <p>Earned :</p>
-                  <p>Total staked :</p>
-                  <p>Total staked :</p>
-                  <Button>Deposit</Button>
-                  <Button>Withdraw</Button>
-                  <Button>Claim rewards</Button>
-                </div>
-              </div>
-              <div style={{ display: 'flex' }}>
-                <div class="left">
-                  <TokenSymbol symbol="BSHARE" />
-                </div>
-                <div class="right">
-                  <h5>BSHARE-BNB</h5>
-                  <p>Recommended</p>
-                  {/*  yha rehta */}
-                  <p>TVL :</p>
-                  <p>Daily returns :</p>
-                  <p>Total staked :</p>
-                  <p>Daily returns :</p>
-                  <p>Earned :</p>
-                  <p>Total staked :</p>
-                  <p>Total staked :</p>
-                  <Button>Deposit</Button>
-                  <Button>Withdraw</Button>
-                  <Button>Claim rewards</Button>
-                </div>
-              </div>
-
-
+                    <div class="left">
+                      <TokenSymbol symbol="BSHARE" />
+                    </div>
+                    <div class="right">
+                      <h5>BOMB-BTCB</h5>
+                      <p>Recommended</p>
+                      {/*  yha rehta */}
+                      <p>TVL :</p>
+                      <p>Daily returns :</p>
+                      <p>Your stake :</p>
+                      <p>Earned :</p>
+                      <Button>Deposit</Button>
+                      <Button>Withdraw</Button>
+                      <Button>Claim rewards</Button>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex' }}>
+                    <div class="left">
+                      <TokenSymbol symbol="BSHARE" />
+                    </div>
+                    <div class="right">
+                      <h5>BSHARE-BNB</h5>
+                      <p>Recommended</p>
+                      {/*  yha rehta */}
+                      <p>TVL :</p>
+                      <p>Daily returns :</p>
+                      <p>Your stake :</p>
+                      <p>Earned :</p>
+                      <Button>Deposit</Button>
+                      <Button>Withdraw</Button>
+                      <Button>Claim rewards</Button>
+                    </div>
+                  </div>
                 </div>
               </div>
               <hr />
             </CardContent>
           </Card>
-        </Grid> 
-    
+        </Grid>
+
         <Grid item xs={12} sm={12}>
           <Card>
             <CardContent align="center" style={{ position: 'relative' }}>
@@ -377,13 +505,34 @@ const Home = () => {
             </CardContent>
           </Card>
         </Grid>
-    
       </Grid>
-
-
-
     </Page>
   );
 };
+
+const StyledCardHeader = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+`;
+const StyledCardActions = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 28px;
+  width: 100%;
+`;
+
+const StyledActionSpacer = styled.div`
+  height: ${(props) => props.theme.spacing[4]}px;
+  width: ${(props) => props.theme.spacing[4]}px;
+`;
+
+const StyledCardContentInner = styled.div`
+  align-items: center;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+`;
 
 export default Home;

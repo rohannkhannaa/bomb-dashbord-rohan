@@ -12,8 +12,8 @@ import IconButton from '../../../components/IconButton';
 import Label from '../../../components/Label';
 import Value from '../../../components/Value';
 
-import useApprove, {ApprovalState} from '../../../hooks/useApprove';
 import useModal from '../../../hooks/useModal';
+import useApprove, {ApprovalState} from '../../../hooks/useApprove';
 import useTokenBalance from '../../../hooks/useTokenBalance';
 import useWithdrawCheck from '../../../hooks/boardroom/useWithdrawCheck';
 
@@ -37,7 +37,6 @@ const Stake: React.FC = () => {
   const tokenBalance = useTokenBalance(bombFinance.BSHARE);
   const stakedBalance = useStakedBalanceOnBoardroom();
   const {from, to} = useUnstakeTimerBoardroom();
-
   const stakedTokenPriceInDollars = useStakedTokenPriceInDollars('BSHARE', bombFinance.BSHARE);
   const tokenPriceInDollars = useMemo(
     () =>
@@ -45,7 +44,7 @@ const Stake: React.FC = () => {
         ? (Number(stakedTokenPriceInDollars) * Number(getDisplayBalance(stakedBalance))).toFixed(2).toString()
         : null,
     [stakedTokenPriceInDollars, stakedBalance],
-  );
+  ); 
   // const isOldBoardroomMember = boardroomVersion !== 'latest';
 
   const {onStake} = useStakeToBoardroom();

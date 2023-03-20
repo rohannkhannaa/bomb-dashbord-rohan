@@ -27,7 +27,7 @@ const Harvest: React.FC = () => {
   );
 
   const earnedInDollars = (Number(tokenPriceInDollars) * Number(getDisplayBalance(earnings))).toFixed(2);
-
+    
   const {from, to} = useClaimRewardTimerBoardroom();
 
   return (
