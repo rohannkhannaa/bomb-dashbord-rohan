@@ -1,6 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import Page from '../../components/Page';
 import { createGlobalStyle } from 'styled-components';
+import moment from 'moment';
+
 import CountUp from 'react-countup';
 import CardIcon from '../../components/CardIcon';
 import TokenSymbol from '../../components/TokenSymbol';
@@ -10,8 +12,11 @@ import useLpStatsBTC from '../../hooks/useLpStatsBTC';
 import useModal from '../../hooks/useModal';
 import useZap from '../../hooks/useZap';
 import useBondStats from '../../hooks/useBondStats';
+import useBombFinance from '../../hooks/useBombFinance'; // Imported bombFinance to use fuiunctions
 import usebShareStats from '../../hooks/usebShareStats';
 import useTotalValueLocked from '../../hooks/useTotalValueLocked';
+import useTreasuryAllocationTimes from '../../hooks/useTreasuryAllocationTimes';
+
 // import { Bomb as bombTesting } from '../../bomb-finance/deployments/deployments.testing.json';
 //import { Bomb as bombProd } from '../../bomb-finance/deployments/deployments.mainnet.json';
 import { roundAndFormatNumber } from '../../0x';
@@ -22,15 +27,16 @@ import { Alert } from '@material-ui/lab';
 import { IoCloseOutline } from 'react-icons/io5';
 import { BiLoaderAlt } from 'react-icons/bi';
 import { makeStyles } from '@material-ui/core/styles';
-import useBombFinance from '../../hooks/useBombFinance';
 //import { ReactComponent as IconTelegram } from '../../assets/img/telegram.svg';
 import { Helmet } from 'react-helmet';
-import {BombFinance} from '../../bomb-finance/BombFinance';
+import Boardroom from '../Boardroom/Boardroom';
 //import useBombMaxiStats from '../../hooks/useBombMaxiStats';
+import useCurrentEpoch from '../../hooks/useCurrentEpoch';
+import ProgressCountdown from './components/ProgressCountdown';
 
 import HomeImage from '../../assets/img/background.jpg';
 const BackgroundImage = createGlobalStyle`
-  body {
+  body { 
     background: url(${HomeImage}) repeat !important;
     background-size: cover !important;
     background-color: #171923;
@@ -53,13 +59,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Home = () => {
-  async function getEpoch() {
-    const bombFinance = new BombFinance();
-    const currentEpoch = await bombFinance.getCurrentEpoch();
-    return currentEpoch;
-  }
-  const currentEpoch = getEpoch();
+const Home = () => {  
+  const { to } = useTreasuryAllocationTimes();
   const classes = useStyles();
   const TVL = useTotalValueLocked();
   const bombFtmLpStats = useLpStatsBTC('BOMB-BTCB-LP');
@@ -68,6 +69,8 @@ const Home = () => {
   const bShareStats = usebShareStats();
   const tBondStats = useBondStats();
   const bombFinance = useBombFinance();
+  const currentEpoch = useCurrentEpoch();
+
   // const bombmaxi = useBombMaxiStats('0xd6f52e8ab206e59a1e13b3d6c5b7f31e90ef46ef000200000000000000000028');
 
   // console.log(bombmaxi);
@@ -92,6 +95,7 @@ const Home = () => {
     () => (bombStats ? Number(bombStats.priceInDollars).toFixed(2) : null),
     [bombStats],
   );
+
   const bombPriceInBNB = useMemo(() => (bombStats ? Number(bombStats.tokenInFtm).toFixed(4) : null), [bombStats]);
   const bombCirculatingSupply = useMemo(() => (bombStats ? String(bombStats.circulatingSupply) : null), [bombStats]);
   const bombTotalSupply = useMemo(() => (bombStats ? String(bombStats.totalSupply) : null), [bombStats]);
@@ -236,9 +240,11 @@ const Home = () => {
                   </table>
                 </div>
                 <div class="right">
-                  <p>Current EPOCH : </p> {currentEpoch} 
+                  <p>Current EPOCH : {Number(currentEpoch)} </p>
                   <hr/>
-                  <p>Next EPOCH in : </p>
+                  <p>Next EPOCH in : 
+                  <ProgressCountdown base={moment().toDate()} hideBar={true} deadline={to} description="Next Epoch" />
+                  </p>
                   <hr/>
                   <p>Live TWAP: </p>
                   <p>TVL: </p>
@@ -246,7 +252,7 @@ const Home = () => {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> 
         </Grid>
 
         {/* BOMB */}

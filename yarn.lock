@@ -8345,6 +8345,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bn.js@npm:^5.2.1":
+  version: 5.2.1
+  resolution: "bn.js@npm:5.2.1"
+  checksum: 3dd8c8d38055fedfa95c1d5fc3c99f8dd547b36287b37768db0abab3c239711f88ff58d18d155dd8ad902b0b0cee973747b7ae20ea12a09473272b0201c9edd3
+  languageName: node
+  linkType: hard
+
 "body-parser@npm:1.19.1, body-parser@npm:^1.16.0, body-parser@npm:^1.18.3":
   version: 1.19.1
   resolution: "body-parser@npm:1.19.1"
@@ -8419,6 +8426,7 @@ __metadata:
     typescript: ^3.9.7
     use-wallet: OGBoogieTomb/use-wallet
     web3: ^1.2.11
+    web3-utils: ^1.8.2
   languageName: unknown
   linkType: soft
 
@@ -29487,6 +29495,21 @@ use-wallet@OGBoogieTomb/use-wallet:
     randombytes: ^2.1.0
     utf8: 3.0.0
   checksum: cd96c8cca5507714bf089eb91d513a3515b6e4a959b9d380ff543b2aa076379a4fb613a64c03a4d4332a8d7e78e5e22bb41ed0092ee634bbd336d12d80a73dc0
+  languageName: node
+  linkType: hard
+
+"web3-utils@npm:^1.8.2":
+  version: 1.8.2
+  resolution: "web3-utils@npm:1.8.2"
+  dependencies:
+    bn.js: ^5.2.1
+    ethereum-bloom-filters: ^1.0.6
+    ethereumjs-util: ^7.1.0
+    ethjs-unit: 0.1.6
+    number-to-bn: 1.7.0
+    randombytes: ^2.1.0
+    utf8: 3.0.0
+  checksum: a6cda086d7bde4939fc55be8f1dc5040b4cacd9205ac2ac07f37d14305214679e030af7814a3e97f6fabf2901e3452cd0dc8ce7c1cdd8bce4d0d4bae72c50ad9
   languageName: node
   linkType: hard
 

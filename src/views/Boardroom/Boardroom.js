@@ -3,8 +3,8 @@ import { useWallet } from 'use-wallet';
 import moment from 'moment';
 import styled from 'styled-components';
 import Spacer from '../../components/Spacer';
-import Harvest from './components/Harvest';
-import Stake from './components/Stake';
+import Harvest from '../Dashboard/components/Harvest';
+import Stake from '../Dashboard/components/Stake';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { Box, Card, CardContent, Button, Typography, Grid } from '@material-ui/core';
@@ -25,7 +25,7 @@ import useTreasuryAllocationTimes from '../../hooks/useTreasuryAllocationTimes';
 import useTotalStakedOnBoardroom from '../../hooks/useTotalStakedOnBoardroom';
 import useClaimRewardCheck from '../../hooks/boardroom/useClaimRewardCheck';
 import useWithdrawCheck from '../../hooks/boardroom/useWithdrawCheck';
-import ProgressCountdown from './components/ProgressCountdown';
+import ProgressCountdown from '../Dashboard/components/ProgressCountdown';
 import { createGlobalStyle } from 'styled-components';
 import { Helmet } from 'react-helmet';
 

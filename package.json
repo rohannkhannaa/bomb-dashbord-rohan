@@ -51,7 +51,8 @@
     "styled-components": "^5.1.1",
     "typescript": "^3.9.7",
     "use-wallet": "OGBoogieTomb/use-wallet",
-    "web3": "^1.2.11"
+    "web3": "^1.2.11",
+    "web3-utils": "^1.8.2"
   },
   "resolutions": {
     "@web3-react/walletconnect-connector": "6.2.8"

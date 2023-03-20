@@ -527,7 +527,8 @@ export class BombFinance {
 
   async getCurrentEpoch(): Promise<BigNumber> {
     const { Treasury } = this.contracts;
-    return Treasury.epoch();
+    const value = await Treasury.epoch();
+    return value ;
   }
 
   async getBondOraclePriceInLastTWAP(): Promise<BigNumber> {
@@ -1076,9 +1077,17 @@ export class BombFinance {
     const nextEpochTimestamp: BigNumber = await Treasury.nextEpochPoint();
     const nextAllocation = new Date(nextEpochTimestamp.mul(1000).toNumber());
     const prevAllocation = new Date(Date.now());
-
+    
     return { from: prevAllocation, to: nextAllocation };
   }
+  
+  // async getEpochTimer(): Promise<BigNumber> {
+  //   const { Treasury } = this.contracts;
+  //   const nextEpochTimestamp: BigNumber = await Treasury.nextEpochPoint();
+  //   return {
+  //     nextEpochTimeStamp : nextEpochTimeStamp , 
+  //   }
+  // }
   /**
    * This method calculates and returns in a from to to format
    * the period the user needs to wait before being allowed to claim

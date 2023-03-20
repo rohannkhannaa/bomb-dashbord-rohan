@@ -13,6 +13,7 @@ const useBombStats = () => {
       try {
         setStat(await bombFinance.getBombStat());
       } catch (err) {
+        
         console.error(err);
       }
     }
