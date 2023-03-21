@@ -1,42 +1,21 @@
 import React, { useCallback, useMemo } from 'react';
-import Page from '../../components/Page';
-import { createGlobalStyle } from 'styled-components';
-import { Route, Switch, useRouteMatch } from 'react-router-dom';
-import PageHeader from '../../components/PageHeader';
 import ExchangeCard from './components/ExchangeCard';
-import styled from 'styled-components';
-import Spacer from '../../components/Spacer';
 import useBondStats from '../../hooks/useBondStats';
 //import useBombStats from '../../hooks/useBombStats';
 import useBombFinance from '../../hooks/useBombFinance';
 import useCashPriceInLastTWAP from '../../hooks/useCashPriceInLastTWAP';
 import { useTransactionAdder } from '../../state/transactions/hooks';
-import ExchangeStat from './components/ExchangeStat';
 import useTokenBalance from '../../hooks/useTokenBalance';
 import useBondsPurchasable from '../../hooks/useBondsPurchasable';
 import { getDisplayBalance } from '../../utils/formatBalance';
 import { BOND_REDEEM_PRICE, BOND_REDEEM_PRICE_BN } from '../../bomb-finance/constants';
-import { Alert } from '@material-ui/lab';
 import TokenSymbol from '../../components/TokenSymbol';
 
-import HomeImage from '../../assets/img/background.jpg';
-import { Grid, Box, Card, CardContent, Button } from '@material-ui/core';
-import { Helmet } from 'react-helmet';
+import { Grid, Card, CardContent, Button } from '@material-ui/core';
 
-import useApprove, { ApprovalState } from '../../hooks/useApprove';
-import useCatchError from '../../hooks/useCatchError';
 
-const BackgroundImage = createGlobalStyle`
-  body {
-    background: url(${HomeImage}) repeat !important;
-    background-size: cover !important;
-    background-color: #171923;
-  }
-`;
-const TITLE = 'bomb.money | Bonds';
 
 const Bond: React.FC = () => {
-  const { path } = useRouteMatch();
   const bombFinance = useBombFinance();
   const addTransaction = useTransactionAdder();
   const bondStat = useBondStats();
@@ -48,13 +27,6 @@ const Bond: React.FC = () => {
   //const scalingFactor = useMemo(() => (cashPrice ? Number(cashPrice) : null), [cashPrice]);
 
   // Added here
-  const catchError = useCatchError();
-  const {
-    contracts: { Treasury },
-  } = useBombFinance();
-  const fromToken = bombFinance.BOMB;
-  const fromTokenName = 'BOMB';
-  const [approveStatus, approve] = useApprove(fromToken, Treasury.address);
 
   const handleBuyBonds = useCallback(
     async (amount: string) => {
@@ -75,9 +47,7 @@ const Bond: React.FC = () => {
   );
   const isBondRedeemable = useMemo(() => cashPrice.gt(BOND_REDEEM_PRICE_BN), [cashPrice]);
   const isBondPurchasable = useMemo(() => Number(bondStat?.tokenInFtm) < 1.01, [bondStat]);
-  const isBondPayingPremium = useMemo(() => Number(bondStat?.tokenInFtm) >= 1.1, [bondStat]);
   // console.log("bondstat", Number(bondStat?.tokenInFtm))
-  const bondScale = (Number(cashPrice) / 100000000000000).toFixed(4);
 
   return (
     <>
@@ -148,34 +118,7 @@ const Bond: React.FC = () => {
   );
 };
 
-const StyledBond = styled.div`
-  display: flex;
-  @media (max-width: 768px) {
-    width: 100%;
-    flex-flow: column nowrap;
-    align-items: center;
-  }
-`;
 
-const StyledCardWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  @media (max-width: 768px) {
-    width: 80%;
-  }
-`;
 
-const StyledStatsWrapper = styled.div`
-  display: flex;
-  flex: 0.8;
-  margin: 0 20px;
-  flex-direction: column;
-
-  @media (max-width: 768px) {
-    width: 80%;
-    margin: 16px 0;
-  }
-`;
 
 export default Bond;

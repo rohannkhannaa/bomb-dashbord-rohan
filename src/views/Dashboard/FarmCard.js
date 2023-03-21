@@ -1,17 +1,12 @@
 import React, { useEffect, useMemo, useContext } from 'react';
 import styled, { ThemeContext } from 'styled-components';
-
-import { Link } from 'react-router-dom';
 import { Box, Button, Card, CardActions, CardContent, Typography, Grid } from '@material-ui/core';
-import CardIcon from '../../components/CardIcon';
 import { AddIcon, RemoveIcon } from '../../components/icons';
 import FlashOnIcon from '@material-ui/icons/FlashOn';
 import IconButton from '../../components/IconButton';
 import TokenSymbol from '../../components/TokenSymbol';
 import { useWallet } from 'use-wallet';
-import UnlockWallet from '../../components/UnlockWallet';
 import useStatsForPool from '../../hooks/useStatsForPool';
-import { makeStyles } from '@material-ui/core/styles';
 import useRedeem from '../../hooks/useRedeem';
 import useEarnings from '../../hooks/useEarnings';
 import useHarvest from '../../hooks/useHarvest';
@@ -29,14 +24,6 @@ import ZapModal from './ZapModal';
 import useModal from '../../hooks/useModal';
 import useStake from '../../hooks/useStake';
 import useZap from '../../hooks/useZap';
-const useStyles = makeStyles((theme) => ({
-  gridItem: {
-    height: '100%',
-    [theme.breakpoints.up('md')]: {
-      height: '90px',
-    },
-  },
-}));
 
 const FarmCard = ({ bank }) => {
   const { account } = useWallet();
@@ -50,7 +37,6 @@ const FarmCard = ({ bank }) => {
 
   // For importing specific details :
   useEffect(() => window.scrollTo(0, 0));
-  const classes = useStyles();
   const { onRedeem } = useRedeem(bank);
   let statsOnPool = useStatsForPool(bank);
 
@@ -75,7 +61,6 @@ const FarmCard = ({ bank }) => {
   const bombStats = useBombStats();
   const tShareStats = useShareStats();
 
-  const tokenName = bank.earnTokenName === 'BSHARE' ? 'BSHARE' : 'BOMB';
   const tokenStats = bank.earnTokenName === 'BSHARE' ? tShareStats : bombStats;
   const tokenPriceInDollars = useMemo(
     () => (tokenStats ? Number(tokenStats.priceInDollars).toFixed(2) : null),
@@ -136,8 +121,7 @@ const FarmCard = ({ bank }) => {
                 borderRadius: '40px',
                 backgroundColor: '#363746',
                 alignItems: 'center',
-                display: 'flex',
-                justifyContent: 'center',
+                display: 'flex', 
               }}
             >
               <TokenSymbol size={32} symbol={bank.depositTokenName} />
