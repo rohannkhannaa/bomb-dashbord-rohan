@@ -90,7 +90,7 @@ const ExchangeCard: React.FC<ExchangeCardProps> = ({
               )}
               </>
             ) : (
-              <UnlockWallet />
+              <></>
             )}
           </StyledCardActions>
         </StyledCardContentInner>

@@ -104,29 +104,37 @@ const Bond: React.FC = () => {
                     </>
                   ) : (
                     <>
-                      <Button
-                        className="shinyButton"
-                        disabled={approveStatus === ApprovalState.PENDING || approveStatus === ApprovalState.UNKNOWN}
-                        onClick={() => catchError(approve(), `Unable to approve ${fromTokenName}`)}
-                      >
-                        Deposit
-                      </Button>
+                      <ExchangeCard
+                        action="Purchase"
+                        fromToken={bombFinance.BOMB}
+                        fromTokenName="BOMB"
+                        toToken={bombFinance.BBOND}
+                        toTokenName="BBOND"
+                        priceDesc={
+                          !isBondPurchasable
+                            ? 'BOMB is over peg'
+                            : getDisplayBalance(bondsPurchasable, 18, 4) + ' BBOND available for purchase'
+                        }
+                        onExchange={handleBuyBonds}
+                        disabled={!bondStat || isBondRedeemable}
+                      />
                     </>
                   )}
                 </div>
                 <div className="redeem">
-
-                <ExchangeCard
-                action="Redeem"
-                fromToken={bombFinance.BBOND}
-                fromTokenName="BBOND"
-                toToken={bombFinance.BOMB}
-                toTokenName="BOMB"
-                priceDesc={`${getDisplayBalance(bondBalance)} BBOND Available in wallet`}
-                onExchange={handleRedeemBonds}
-                disabled={!bondStat || bondBalance.eq(0) || !isBondRedeemable}
-                disabledDescription={!isBondRedeemable ? `Redeem Enabled when 10,000 BOMB > ${BOND_REDEEM_PRICE}BTC` : null}
-              />
+                  <ExchangeCard
+                    action="Redeem"
+                    fromToken={bombFinance.BBOND}
+                    fromTokenName="BBOND"
+                    toToken={bombFinance.BOMB}
+                    toTokenName="BOMB"
+                    priceDesc={`${getDisplayBalance(bondBalance)} BBOND Available in wallet`}
+                    onExchange={handleRedeemBonds}
+                    disabled={!bondStat || bondBalance.eq(0) || !isBondRedeemable}
+                    disabledDescription={
+                      !isBondRedeemable ? `Redeem Enabled when 10,000 BOMB > ${BOND_REDEEM_PRICE}BTC` : null
+                    }
+                  />
                 </div>
                 <hr />
                 <div className="redeem"></div>
