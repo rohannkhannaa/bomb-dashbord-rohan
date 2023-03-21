@@ -1,0 +1,20 @@
+.parent {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .child1 {
+    flex: 1 1 auto;
+  }
+  
+  .child2 {
+    flex: 1 1 auto;
+  }
+  
+  @media only screen and (max-width: 600px) {
+    .parent {
+      flex-wrap: nowrap;
+      flex-direction: column;
+    }
+  }
+  

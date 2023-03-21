@@ -2,6 +2,8 @@
 // Rohan
 // IIT Ropar Btech CSE
 // Entry Number : 2020CSB1117
+import './Dashboard.css';
+import useTotalValueLocked from '../../hooks/useTotalValueLocked';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import Page from '../../components/Page';
@@ -24,7 +26,7 @@ import Bond from './Bond';
 //import { Bomb as bombProd } from '../../bomb-finance/deployments/deployments.mainnet.json';
 import useTotalStakedOnBoardroom from '../../hooks/useTotalStakedOnBoardroom';
 import { roundAndFormatNumber } from '../../0x';
-import { Button, Card, CardContent, Grid} from '@material-ui/core';
+import { Button, Card, CardContent, Grid } from '@material-ui/core';
 import ZapModal from '../Bank/components/ZapModal';
 //import { ReactComponent as IconTelegram } from '../../assets/img/telegram.svg';
 import { Helmet } from 'react-helmet';
@@ -33,7 +35,6 @@ import useCurrentEpoch from '../../hooks/useCurrentEpoch';
 import ProgressCountdown from './components/ProgressCountdown';
 
 import HomeImage from '../../assets/img/background.jpg';
-
 import DepositModal from './components/DepositModal';
 import WithdrawModal from './components/WithdrawModal';
 import useStakedBalanceOnBoardroom from '../../hooks/useStakedBalanceOnBoardroom';
@@ -53,6 +54,7 @@ import useHarvestFromBoardroom from '../../hooks/useHarvestFromBoardroom';
 import useEarningsOnBoardroom from '../../hooks/useEarningsOnBoardroom';
 import useBanks from '../../hooks/useBanks';
 import FarmCard from './FarmCard';
+import useCashPriceInLastTWAP from '../../hooks/useCashPriceInLastTWAP';
 
 const BackgroundImage = createGlobalStyle`
   body { 
@@ -70,6 +72,12 @@ const TITLE = 'bomb.money | BTC pegged algocoin';
 // `;
 
 const Home = () => {
+  function handleClickDiscord() {
+    window.location.href = 'https://discord.bomb.money';
+  }
+  function handleClickReadDocs() {
+    window.location.href = 'https://docs.bomb.money/welcome-start-here/readme';
+  }
   const bombStats = useBombStats();
   const bShareStats = usebShareStats();
   const tBondStats = useBondStats();
@@ -88,7 +96,6 @@ const Home = () => {
   );
 
   const bombCirculatingSupply = useMemo(() => (bombStats ? String(bombStats.circulatingSupply) : null), [bombStats]);
-  const bombTotalSupply = useMemo(() => (bombStats ? String(bombStats.totalSupply) : null), [bombStats]);
 
   const bSharePriceInDollars = useMemo(
     () => (bShareStats ? Number(bShareStats.priceInDollars).toFixed(2) : null),
@@ -99,7 +106,6 @@ const Home = () => {
     () => (bShareStats ? String(bShareStats.circulatingSupply) : null),
     [bShareStats],
   );
-  const bShareTotalSupply = useMemo(() => (bShareStats ? String(bShareStats.totalSupply) : null), [bShareStats]);
 
   const tBondPriceInDollars = useMemo(
     () => (tBondStats ? Number(tBondStats.priceInDollars).toFixed(2) : null),
@@ -109,12 +115,11 @@ const Home = () => {
     () => (tBondStats ? String(tBondStats.circulatingSupply) : null),
     [tBondStats],
   );
-  const tBondTotalSupply = useMemo(() => (tBondStats ? String(tBondStats.totalSupply) : null), [tBondStats]);
 
   const bombLpZap = useZap({ depositTokenName: 'BOMB-BTCB-LP' });
   const bshareLpZap = useZap({ depositTokenName: 'BSHARE-BNB-LP' });
 
-  const [ onDissmissBombZap] = useModal(
+  const [onDissmissBombZap] = useModal(
     <ZapModal
       decimals={18}
       onConfirm={(zappingToken, tokenName, amount) => {
@@ -126,7 +131,7 @@ const Home = () => {
     />,
   );
 
-  const [ onDissmissBshareZap] = useModal(
+  const [onDissmissBshareZap] = useModal(
     <ZapModal
       decimals={18}
       onConfirm={(zappingToken, tokenName, amount) => {
@@ -137,8 +142,6 @@ const Home = () => {
       tokenName={'BSHARE-BNB-LP'}
     />,
   );
-
-
 
   // const [onPresentIntroVid] = useModal(
   //   <grid>
@@ -165,7 +168,7 @@ const Home = () => {
   const totalStaked = useTotalStakedOnBoardroom();
   const { account } = useWallet();
   const bombFinance = useBombFinance();
-  const [approveStatus, approve] = useApprove(bombFinance.BSHARE, bombFinance.contracts.Boardroom.address);
+  const [approveStatus, approve] = useApprove(bombFinance.  BSHARE, bombFinance.contracts.Boardroom.address);
   const tokenBalance = useTokenBalance(bombFinance.BSHARE);
   const stakedBalance = useStakedBalanceOnBoardroom();
   const stakedTokenPriceInDollars = useStakedTokenPriceInDollars('BSHARE', bombFinance.BSHARE);
@@ -187,6 +190,7 @@ const Home = () => {
   const { onStake } = useStakeToBoardroom();
   const { onWithdraw } = useWithdrawFromBoardroom();
   const canWithdrawFromBoardroom = useWithdrawCheck();
+  const bombPriceInBNB = useMemo(() => (bombStats ? Number(bombStats.tokenInFtm).toFixed(4) : null), [bombStats]);
 
   // For bomb farms on dashboard :
   const [banks] = useBanks();
@@ -201,7 +205,12 @@ const Home = () => {
       tokenName={'BShare'}
     />,
   );
-
+  const cashPrice = useCashPriceInLastTWAP();
+  const bondScale = (Number(cashPrice) / 100000000000000).toFixed(4);
+  const bSharePriceInBNB = useMemo(
+    () => (bShareStats ? Number(bShareStats.tokenInFtm).toFixed(4) : null),
+    [bShareStats],
+  );
   const [onPresentWithdraw, onDismissWithdraw] = useModal(
     <WithdrawModal
       max={stakedBalance}
@@ -213,7 +222,8 @@ const Home = () => {
     />,
   );
   const boardroomAPR = useFetchBoardroomAPR();
-
+  const tBondPriceInBNB = useMemo(() => (tBondStats ? Number(tBondStats.tokenInFtm).toFixed(4) : null), [tBondStats]);
+    const TVL = useTotalValueLocked();
   return (
     <Page>
       <Helmet>
@@ -222,81 +232,123 @@ const Home = () => {
       <BackgroundImage />
       <Grid container spacing={3}>
         {/* Logo */}
-        <Grid
-          item
-          xs={12}
-          sm={4}
-          style={{ display: 'flex', justifyContent: 'center', verticalAlign: 'middle', overflow: 'hidden' }}
-        ></Grid>
+        <Grid item xs={12} sm={4} style={{ display: 'flex', justifyContent: 'center', verticalAlign: 'middle' }}></Grid>
         {/* Explanation text */}
         {/* TVL */}
         <Grid item xs={12} sm={13}>
           <Card>
             <CardContent align="center" style={{ position: 'relative' }}>
-              Bomb Finance Summary
+              <h2>Bomb Finance Summary</h2>
               <hr />
-              <div style={{ display: 'flex' }}>
-                <div class="left" style = {{margin : '5px 5px 100px 5px'}}>
-                  <table>
+              <div className="parent" style={{ justifyContent: 'space-between' }}>
+                <div className="left child1" style={{ margin: '5px 5px 100px 5px' }}>
+                  <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                     <thead>
-                      <td></td>
-                      <td>Current Suply</td>
-                      <td>Total Supply</td>
-                      <td>Price</td>
+                      <tr>
+                        <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}></th>
+                        <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Current Suply</th>
+                        <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Total Supply</th>
+                        <th style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>Price</th>
+                      </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>
+                      <tr style={{ borderTop: '1px solid #ddd' }}>
+                        <td style={{alignContent:'center' , padding: '10px', borderBottom: '1px solid #ddd', verticalAlign: 'center' }}>
                           <TokenSymbol symbol="BOMB" />
-                          $BOMB
+                          <p style={{ display: 'inline', verticalAlign: 'center' }}>$BOMB</p>
                         </td>
-                        <td>${roundAndFormatNumber(bombCirculatingSupply * bombPriceInDollars, 2)}</td>
-                        <td>{roundAndFormatNumber(bombCirculatingSupply, 2)}</td>
-                        <td>{roundAndFormatNumber(bombTotalSupply, 2)}</td>
+                        <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+                          ${roundAndFormatNumber(bombCirculatingSupply * bombPriceInDollars, 2)}
+                        </td>
+                        <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+                          {roundAndFormatNumber(bombCirculatingSupply, 2)}
+                        </td>
+                        <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+                          ${bombPriceInDollars ? roundAndFormatNumber(bombPriceInDollars, 2) : '-.--'}
+                          <br />{bombPriceInBNB ? bombPriceInBNB : '-.----'} BTC
+                        </td>
                       </tr>
-                      <tr>
-                        <td>
+                      <tr style={{ borderTop: '1px solid #ddd' }}>
+                        <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
                           <TokenSymbol symbol="BSHARE" />
-                          $BSHARE
+                          <p style={{ display: 'inline', verticalAlign: 'center' }}>$BSHARE</p>
                         </td>
-                        <td>${roundAndFormatNumber((bShareCirculatingSupply * bSharePriceInDollars).toFixed(2), 2)}</td>
-                        <td>{roundAndFormatNumber(bShareCirculatingSupply, 2)}</td>
-                        <td>{roundAndFormatNumber(bShareTotalSupply, 2)}</td>
+                        <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+                          ${roundAndFormatNumber((bShareCirculatingSupply * bSharePriceInDollars).toFixed(2), 2)}
+                        </td>
+                        <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+                          {roundAndFormatNumber(bShareCirculatingSupply, 2)}
+                        </td>
+                        <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+                        ${bSharePriceInDollars ? bSharePriceInDollars : '-.--'}
+                          <br/>
+                          {bSharePriceInBNB ? bSharePriceInBNB : '-.----'} BNB
+                        </td>
                       </tr>
-                      <tr>
-                        <td>
-                          <TokenSymbol symbol="BBOND" /> $BBOND
+                      <tr style={{ borderTop: '1px solid #ddd' }}>
+                        <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+                          <TokenSymbol symbol="BBOND" />{' '}
+                          <p style={{ display: 'inline', verticalAlign: 'center' }}>$BBOND</p>
                         </td>
-                        <td>${roundAndFormatNumber((tBondCirculatingSupply * tBondPriceInDollars).toFixed(2), 2)}</td>
-                        <td>{roundAndFormatNumber(tBondCirculatingSupply, 2)}</td>
-                        <td>{roundAndFormatNumber(tBondTotalSupply, 2)}</td>
+                        <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+                          ${roundAndFormatNumber((tBondCirculatingSupply * tBondPriceInDollars).toFixed(2), 2)}
+                        </td>
+                        <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+                          {roundAndFormatNumber(tBondCirculatingSupply, 2)}
+                        </td>
+                        <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
+                        ${tBondPriceInDollars ? tBondPriceInDollars : '-.--'}
+                        <br/>
+                          {tBondPriceInBNB ? tBondPriceInBNB : '-.----'} BTC
+                        <br/>
+                        </td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <div class="right">
-                  <p>Current EPOCH : {Number(currentEpoch)} </p>
+                <div className="right child2" style={{ marginRight: '4%' }}>
+                  <p style={{ fontSize: 'large', padding: '0px', margin: '2px' }}>
+                    Current EPOCH
+                    <br />
+                  </p>
+                  <p style={{ fontSize: 'xx-large', padding: '0px', margin: '2px' }}>{Number(currentEpoch)}</p>
                   <hr />
-                  <p>
-                    Next EPOCH in :
+                  <p style={{ fontSize: 'xx-large', margin: '2px' }}>
                     <ProgressCountdown base={moment().toDate()} hideBar={true} deadline={to} description="Next Epoch" />
                   </p>
+                  <p style={{ fontSize: 'large', margin: '2px' }}>Next EPOCH in</p>
                   <hr />
-                  <p>Live TWAP: </p>
-                  <p>TVL: </p>
-                  <p>Last Epoch TWAP: </p>
+                  <p>Live TWAP: <span style= {{color : 'rgba(0, 232, 162, 1)'}}>{bondScale}</span></p>
+                  <p>TVL: <span style={{color : 'rgba(0, 232, 162, 1)'}}>${TVL}</span> </p>
+                  <p>Last Epoch TWAP:<span>{}</span> </p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={4} style={{ width: '25%', height: '3%' }}>
           <Card>
-            <CardContent align="center" style={{ position: 'relative' }}>
-              <p>INVEST NOW</p>
-              <button>Chat on Discord</button>
-              <button>TRead docs</button>
+            <CardContent align="center" style={{ display: 'flex', flexDirection: 'column', padding: '0' }}>
+              <p
+                style={{
+                  flex: 1,
+                  width: '100%',
+                  background:
+                    'radial-gradient(59345.13% 4094144349.28% at 39511.5% -2722397851.45%, rgba(0, 245, 171, 0.5) 0%, rgba(0, 173, 232, 0.5) 100%)',
+                  margin: '0',
+                }}
+              >
+                INVEST NOW
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <button onClick={handleClickDiscord} style={{ flex: 1, width: '100%', backgroundColor: 'grey' }}>
+                  Chat on Discord
+                </button>
+                <button onClick={handleClickReadDocs} style={{ flex: 1, width: '100%', backgroundColor: 'grey' }}>
+                  Read docs
+                </button>
+              </div>
             </CardContent>
           </Card>
         </Grid>
@@ -310,20 +362,27 @@ const Home = () => {
                     <TokenSymbol symbol="BSHARE" />
                   </div>
                   <div class="right">
-                    <h3>Board room</h3>
+                    <h3 style={{ display: 'inline' }}>Board room . . . . </h3>
+                    <p style={{ background: 'rgba(0, 232, 162, 0.5)', borderRadius: '3px', display: 'inline' }}>
+                      {' '}
+                      Recommened
+                    </p>
+                    <hr />
                     <p>Stake BSHARE and earn BOMB every epoch</p>
                     {/*  yha rehta */}
-                    <p>TVL :</p>
+                    <p>TVL :{TVL}</p>
                     <p>Total staked: {getDisplayBalance(totalStaked)}</p>
                     <hr />
                     <p>Daily returns :</p>
                     {boardroomAPR.toFixed(2) / 365}%
                     <p>
+                      <hr/>
                       Your stake :
                       <Value value={getDisplayBalance(stakedBalance)} />
                       <Label text={`≈ $${tokenPriceInDollars}`} variant="yellow" />
                       <Label text={'BSHARE Staked'} variant="yellow" />
                     </p>
+                    <hr/>
                     <p>
                       Earned :
                       <Value value={getDisplayBalance(earnings)} />
@@ -386,7 +445,6 @@ const Home = () => {
           <UnlockWallet />
         )}
 
-
         {/* Details only shown after account Login, else user asked to connect wallet first */}
         {!!account ? (
           <>
@@ -395,7 +453,7 @@ const Home = () => {
                 <CardContent style={{ position: 'relative' }}>
                   <h2>BOMB FARMS</h2>
                   <hr />
-                  <hr />
+                  
                   <Grid container spacing={3} style={{ marginTop: '20px' }}>
                     {activeBanks
                       .filter((bank) => bank.sectionInUI === 3)
@@ -415,24 +473,21 @@ const Home = () => {
         )}
 
         {/* BONDSHARE */}
-          {
-            !!account ? (<>
-              <Bond/>
-            </>):(
-              <></>
-            )
-          }
-
+        {!!account ? (
+          <>
+            <Bond />
+          </>
+        ) : (
+          <></>
+        )}
       </Grid>
     </Page>
   );
 };
 
-
 const StyledActionSpacer = styled.div`
   height: ${(props) => props.theme.spacing[4]}px;
   width: ${(props) => props.theme.spacing[4]}px;
 `;
-
 
 export default Home;

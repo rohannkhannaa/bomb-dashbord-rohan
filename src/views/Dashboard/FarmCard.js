@@ -24,7 +24,7 @@ import ZapModal from './ZapModal';
 import useModal from '../../hooks/useModal';
 import useStake from '../../hooks/useStake';
 import useZap from '../../hooks/useZap';
-
+import './css/FarmCard.css';
 const FarmCard = ({ bank }) => {
   const { account } = useWallet();
   let depositToken = bank.depositTokenName.toUpperCase();
@@ -121,14 +121,15 @@ const FarmCard = ({ bank }) => {
                 borderRadius: '40px',
                 backgroundColor: '#363746',
                 alignItems: 'center',
-                display: 'flex', 
+                display: 'flex',
               }}
             >
               <TokenSymbol size={32} symbol={bank.depositTokenName} />
             </Box>
-            <Typography variant="h5" component="h2">
+            <Typography variant="h5" component="h2" style={{ display: 'inline', marginRight: '2rem' }}>
               {bank.depositTokenName}
             </Typography>
+            <p style={{ background: 'rgba(0, 232, 162, 0.5)', borderRadius: '3px', display: 'inline' }}> Recommened</p>
             <Typography color="textSecondary">
               {/* {bank.name} */}
               Deposit {depositToken.toUpperCase()} Earn {` ${bank.earnTokenName}`}
@@ -138,10 +139,12 @@ const FarmCard = ({ bank }) => {
         <CardActions style={{ justifyContent: 'flex-end' }}>
           {!!account ? (
             <>
-              <p>TVL : {statsOnPool?.TVL}</p>
-              <p>Daily Returns : {bank.closedForStaking ? '0.00' : statsOnPool?.dailyAPR}</p>
-              <p>Your stake : ${earnedInDollars2}</p>
-              <p>Earned : ${earnedInDollars}</p>
+              <p className="boardRoomContent">TVL<br/>{statsOnPool?.TVL}</p>
+              <p className="boardRoomContent">
+                Daily Returns<br/>{bank.closedForStaking ? '0.00' : statsOnPool?.dailyAPR}
+              </p>
+              <p className="boardRoomContent">Your stake<br/>${earnedInDollars2}</p>
+              <p className="boardRoomContent">Earned<br/>${earnedInDollars}</p>
               {/* Deposit button */}
               <div className="deposit">
                 {approveStatus !== ApprovalState.APPROVED ? (
@@ -204,14 +207,16 @@ const FarmCard = ({ bank }) => {
 
               {/* Claim Rewards */}
               <div className="claimReward">
-              <Button
-              onClick={onReward}
-              disabled={earnings.eq(0)}
-              className={earnings.eq(0) ? 'shinyButtonDisabled' : 'shinyButton'}
-            >
-              Claim
-            </Button>
+                <Button
+                  onClick={onReward}
+                  disabled={earnings.eq(0)}
+                  className={earnings.eq(0) ? 'shinyButtonDisabled' : 'shinyButton'}
+                >
+                  Claim
+                </Button>
               </div>
+              <br/>
+              <hr/>
             </>
           ) : (
             <></>
