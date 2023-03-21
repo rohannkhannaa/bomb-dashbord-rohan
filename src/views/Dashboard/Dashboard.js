@@ -18,7 +18,7 @@ import useTreasuryAllocationTimes from '../../hooks/useTreasuryAllocationTimes';
 import { useWallet } from 'use-wallet';
 import UnlockWallet from '../../components/UnlockWallet';
 import useFetchBoardroomAPR from '../../hooks/useFetchBoardroomAPR';
-
+import Bond from "./Bond";
 // import { Bomb as bombTesting } from '../../bomb-finance/deployments/deployments.testing.json';
 //import { Bomb as bombProd } from '../../bomb-finance/deployments/deployments.mainnet.json';
 import useTotalStakedOnBoardroom from '../../hooks/useTotalStakedOnBoardroom';
@@ -33,7 +33,7 @@ import useCurrentEpoch from '../../hooks/useCurrentEpoch';
 import ProgressCountdown from './components/ProgressCountdown';
 
 import HomeImage from '../../assets/img/background.jpg';
-
+ 
 import DepositModal from './components/DepositModal';
 import WithdrawModal from './components/WithdrawModal';
 import useStakedBalanceOnBoardroom from '../../hooks/useStakedBalanceOnBoardroom';
@@ -64,7 +64,6 @@ const BackgroundImage = createGlobalStyle`
   }
 `;
 const TITLE = 'bomb.money | BTC pegged algocoin';
-
 // const BackgroundImage = createGlobalStyle`
 //   body {
 //     background-color: grey;
@@ -215,19 +214,15 @@ const Home = () => {
         : null,
     [stakedTokenPriceInDollars, stakedBalance],
   );
-
   const { to } = useTreasuryAllocationTimes();
-
   const { onReward } = useHarvestFromBoardroom();
   const earnings = useEarningsOnBoardroom();
   const canClaimReward = useClaimRewardCheck();
-
   const earnedInDollars = (Number(tokenPriceInDollars) * Number(getDisplayBalance(earnings))).toFixed(2);
   const { from2, to2 } = useClaimRewardTimerBoardroom();
   // const isOldBoardroomMember = boardroomVersion !== 'latest';
   const canWithdraw = useWithdrawCheck();
   const { onRedeem } = useRedeemOnBoardroom();
-
   const { onStake } = useStakeToBoardroom();
   const { onWithdraw } = useWithdrawFromBoardroom();
   const canWithdrawFromBoardroom = useWithdrawCheck();
@@ -430,7 +425,7 @@ const Home = () => {
 
         {/* BSHARE */}
 
-        <Grid item xs={12} sm={12}>
+        {!!account?(<Grid item xs={12} sm={12}>
           <Card>
             <CardContent align="center" style={{ position: 'relative' }}>
               <div style={{ display: 'flex' }}>
@@ -450,7 +445,6 @@ const Home = () => {
                     <div class="right">
                       <h5>BOMB-BTCB</h5>
                       <p>Recommended</p>
-                      {/*  yha rehta */}
                       <p>TVL :</p>
                       <p>Daily returns :</p>
                       <p>Your stake :</p>
@@ -482,29 +476,9 @@ const Home = () => {
               <hr />
             </CardContent>
           </Card>
-        </Grid>
+        </Grid>):(<></>)}
 
-        <Grid item xs={12} sm={12}>
-          <Card>
-            <CardContent align="center" style={{ position: 'relative' }}>
-              <div style={{ display: 'flex' }}>
-                <div class="left">
-                  <TokenSymbol symbol="BSHARE" />
-                </div>
-                <div class="right">
-                  <h3>Bonds</h3>
-                  <p>BBOND can be purchased only on contraction periods, when TWAP of BOMB is below 1</p>
-                  {/*  yha rehta */}
-                  <p>BBOND = </p>
-                  <p>Available to redeem :</p>
-                  <Button>Purchase BBOND</Button>
-                  <Button>Redeem BOMB</Button>
-                </div>
-              </div>
-              <hr />
-            </CardContent>
-          </Card>
-        </Grid>
+          {!!account?(<><Bond/></>):(<></>)}
       </Grid>
     </Page>
   );

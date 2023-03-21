@@ -15,13 +15,11 @@ import useBanks from '../../hooks/useBanks';
 import { Helmet } from 'react-helmet';
 
 import HomeImage from '../../assets/img/background.jpg';
-const BackgroundImage = createGlobalStyle`
-  body {
+const BackgroundImage = createGlobalStyle`body {
     background: url(${HomeImage}) repeat !important;
     background-size: cover !important;
     background-color: #171923;
-  }
-`;
+  }`;
 
 const TITLE = 'bomb.money | Farms';
 
