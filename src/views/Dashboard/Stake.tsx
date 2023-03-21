@@ -5,30 +5,30 @@ import styled from 'styled-components';
 import {Button, Card, CardContent, Typography} from '@material-ui/core';
 // import Card from '../../../components/Card';
 // import CardContent from '../../../components/CardContent';
-import CardIcon from '../../../components/CardIcon';
-import {AddIcon, RemoveIcon} from '../../../components/icons';
+import CardIcon from '../../components/CardIcon';
+import {AddIcon, RemoveIcon} from '../../components/icons';
 import FlashOnIcon from '@material-ui/icons/FlashOn';
-import IconButton from '../../../components/IconButton';
+import IconButton from '../../components/IconButton';
 //import Label from '../../../components/Label';
-import Value from '../../../components/Value';
+import Value from '../../components/Value';
 import {ThemeContext} from 'styled-components';
 
-import useApprove, {ApprovalState} from '../../../hooks/useApprove';
-import useModal from '../../../hooks/useModal';
-import useStake from '../../../hooks/useStake';
-import useZap from '../../../hooks/useZap';
-import useStakedBalance from '../../../hooks/useStakedBalance';
-import useStakedTokenPriceInDollars from '../../../hooks/useStakedTokenPriceInDollars';
-import useTokenBalance from '../../../hooks/useTokenBalance';
-import useWithdraw from '../../../hooks/useWithdraw';
+import useApprove, {ApprovalState} from '../../hooks/useApprove';
+import useModal from '../../hooks/useModal';
+import useStake from '../../hooks/useStake';
+import useZap from '../../hooks/useZap';
+import useStakedBalance from '../../hooks/useStakedBalance';
+import useStakedTokenPriceInDollars from '../../hooks/useStakedTokenPriceInDollars';
+import useTokenBalance from '../../hooks/useTokenBalance';
+import useWithdraw from '../../hooks/useWithdraw';
 
-import {getDisplayBalance} from '../../../utils/formatBalance';
+import {getDisplayBalance} from '../../utils/formatBalance';
 
 import DepositModal from './DepositModal';
 import WithdrawModal from './WithdrawModal';
 import ZapModal from './ZapModal';
-import TokenSymbol from '../../../components/TokenSymbol';
-import {Bank} from '../../../bomb-finance';
+import TokenSymbol from '../../components/TokenSymbol';
+import {Bank} from '../../bomb-finance';
 
 interface StakeProps {
   bank: Bank;

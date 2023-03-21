@@ -13,12 +13,11 @@ import useZap from '../../hooks/useZap';
 import useBondStats from '../../hooks/useBondStats';
 import useBombFinance from '../../hooks/useBombFinance'; // Imported bombFinance to use fuiunctions
 import usebShareStats from '../../hooks/usebShareStats';
-import useTotalValueLocked from '../../hooks/useTotalValueLocked';
 import useTreasuryAllocationTimes from '../../hooks/useTreasuryAllocationTimes';
 import { useWallet } from 'use-wallet';
 import UnlockWallet from '../../components/UnlockWallet';
 import useFetchBoardroomAPR from '../../hooks/useFetchBoardroomAPR';
-import Bond from "./Bond";
+import Bond from './Bond';
 // import { Bomb as bombTesting } from '../../bomb-finance/deployments/deployments.testing.json';
 //import { Bomb as bombProd } from '../../bomb-finance/deployments/deployments.mainnet.json';
 import useTotalStakedOnBoardroom from '../../hooks/useTotalStakedOnBoardroom';
@@ -33,7 +32,7 @@ import useCurrentEpoch from '../../hooks/useCurrentEpoch';
 import ProgressCountdown from './components/ProgressCountdown';
 
 import HomeImage from '../../assets/img/background.jpg';
- 
+
 import DepositModal from './components/DepositModal';
 import WithdrawModal from './components/WithdrawModal';
 import useStakedBalanceOnBoardroom from '../../hooks/useStakedBalanceOnBoardroom';
@@ -49,12 +48,15 @@ import useWithdrawCheck from '../../hooks/boardroom/useWithdrawCheck';
 import Label from '../../components/Label';
 import Value from '../../components/Value';
 import useRedeemOnBoardroom from '../../hooks/useRedeemOnBoardroom';
-
+import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import CardIcon from '../../components/CardIcon';
 import useClaimRewardTimerBoardroom from '../../hooks/boardroom/useClaimRewardTimerBoardroom';
 import useClaimRewardCheck from '../../hooks/boardroom/useClaimRewardCheck';
 import useHarvestFromBoardroom from '../../hooks/useHarvestFromBoardroom';
 import useEarningsOnBoardroom from '../../hooks/useEarningsOnBoardroom';
+import useBanks from '../../hooks/useBanks';
+import FarmCard from './FarmCard';
+
 
 const BackgroundImage = createGlobalStyle`
   body { 
@@ -227,6 +229,11 @@ const Home = () => {
   const { onWithdraw } = useWithdrawFromBoardroom();
   const canWithdrawFromBoardroom = useWithdrawCheck();
 
+
+    // For bomb farms on dashboard :
+    const [banks] = useBanks();
+  const { path } = useRouteMatch();
+  const activeBanks = banks.filter((bank) => !bank.finished);
   const [onPresentDeposit, onDismissDeposit] = useModal(
     <DepositModal
       max={tokenBalance}
@@ -339,6 +346,105 @@ const Home = () => {
 
         {/* Details only shown after account Login, else user asked to connect wallet first */}
         {!!account ? (
+          <>
+            <Grid item xs={12} sm={12}>
+              <Card>
+                <CardContent align="center" style={{ position: 'relative' }}>
+                  <div style={{ display: 'flex' }}>
+                    <div class="left">
+                      <TokenSymbol symbol="BSHARE" />
+                    </div>
+                    <div class="right">
+                      <h3>Board room</h3>
+                      <p>Stake BSHARE and earn BOMB every epoch</p>
+                      {/*  yha rehta */}
+                      <p>TVL :</p>
+                      <p>Total staked: {getDisplayBalance(totalStaked)}</p>
+                      <hr />
+                      <p>Daily returns :</p>
+                      {boardroomAPR.toFixed(2) / 365}%
+                      <p>
+                        Your stake :
+                        <Value value={getDisplayBalance(stakedBalance)} />
+                        <Label text={`≈ $${tokenPriceInDollars}`} variant="yellow" />
+                        <Label text={'BSHARE Staked'} variant="yellow" />
+                      </p>
+                      <p>
+                        Earned :
+                        <Value value={getDisplayBalance(earnings)} />
+                        <Label text={`≈ $${earnedInDollars}`} variant="yellow" />
+                        <Label text="BOMB Earned" variant="yellow" />
+                      </p>
+                      <div class="Deposit">
+                        {approveStatus !== ApprovalState.APPROVED ? (
+                          <Button
+                            disabled={approveStatus !== ApprovalState.NOT_APPROVED}
+                            className={
+                              approveStatus === ApprovalState.NOT_APPROVED ? 'shinyButton' : 'shinyButtonDisabled'
+                            }
+                            style={{ marginTop: '20px' }}
+                            onClick={approve}
+                          >
+                            Deposit
+                          </Button>
+                        ) : (
+                          <>
+                            <IconButton disabled={!canWithdrawFromBoardroom} onClick={onPresentWithdraw}>
+                              <RemoveIcon color={!canWithdrawFromBoardroom ? '' : 'yellow'} />
+                            </IconButton>
+                            <StyledActionSpacer />
+                            <IconButton onClick={onPresentDeposit}>
+                              <AddIcon color={!canWithdrawFromBoardroom ? '' : 'yellow'} />
+                            </IconButton>
+                          </>
+                        )}
+                      </div>
+                      <div className="withdraw">
+                        <Button
+                          disabled={stakedBalance.eq(0) || (!canWithdraw && !canClaimReward)}
+                          onClick={onRedeem}
+                          className={
+                            stakedBalance.eq(0) || (!canWithdraw && !canClaimReward)
+                              ? 'shinyButtonDisabledSecondary'
+                              : 'shinyButtonSecondary'
+                          }
+                        >
+                          Withdraw
+                        </Button>
+                      </div>
+                      <div className="claim">
+                        <Button
+                          onClick={onReward}
+                          className={earnings.eq(0) || !canClaimReward ? 'shinyButtonDisabled' : 'shinyButton'}
+                          disabled={earnings.eq(0) || !canClaimReward}
+                        >
+                          Claim Reward
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                  <hr />
+                </CardContent>
+              </Card>
+            </Grid>
+          </>
+        ) : (
+          <UnlockWallet />
+        )}
+
+        {/* BSHARE */}
+
+        {!!account ? (
+          <>
+          <Grid container spacing={3} style={{ marginTop: '20px' }}>
+              {activeBanks
+                .filter((bank) => bank.sectionInUI === 3)
+                .map((bank) => (
+                  <React.Fragment key={bank.name}>
+                    <FarmCard bank={bank} />
+                  </React.Fragment>
+                ))}
+            </Grid>
           <Grid item xs={12} sm={12}>
             <Card>
               <CardContent align="center" style={{ position: 'relative' }}>
@@ -347,71 +453,43 @@ const Home = () => {
                     <TokenSymbol symbol="BSHARE" />
                   </div>
                   <div class="right">
-                    <h3>Board room</h3>
-                    <p>Stake BSHARE and earn BOMB every epoch</p>
+                    <h3>Bomb Farms</h3>
+                    <p>Stake your LP tokens in our farms to start earning $BSHARE</p>
+                    <Button>Claim all</Button>
                     {/*  yha rehta */}
-                    <p>TVL :</p>
-                    <p>Total staked: {getDisplayBalance(totalStaked)}</p>
                     <hr />
-                    <p>Daily returns :</p>
-                    {boardroomAPR.toFixed(2) / 365}%
-                    <p>
-                      Your stake :
-                      <Value value={getDisplayBalance(stakedBalance)} />
-                      <Label text={`≈ $${tokenPriceInDollars}`} variant="yellow" />
-                      <Label text={'BSHARE Staked'} variant="yellow" />
-                    </p>
-                    <p>
-                      Earned :
-                      <Value value={getDisplayBalance(earnings)} />
-                      <Label text={`≈ $${earnedInDollars}`} variant="yellow" />
-                      <Label text="BOMB Earned" variant="yellow" />
-                    </p>
-                    <div class="Deposit">
-                      {approveStatus !== ApprovalState.APPROVED ? (
-                        <Button
-                          disabled={approveStatus !== ApprovalState.NOT_APPROVED}
-                          className={
-                            approveStatus === ApprovalState.NOT_APPROVED ? 'shinyButton' : 'shinyButtonDisabled'
-                          }
-                          style={{ marginTop: '20px' }}
-                          onClick={approve}
-                        >
-                          Deposit
-                        </Button>
-                      ) : (
-                        <>
-                          <IconButton disabled={!canWithdrawFromBoardroom} onClick={onPresentWithdraw}>
-                            <RemoveIcon color={!canWithdrawFromBoardroom ? '' : 'yellow'} />
-                          </IconButton>
-                          <StyledActionSpacer />
-                          <IconButton onClick={onPresentDeposit}>
-                            <AddIcon color={!canWithdrawFromBoardroom ? '' : 'yellow'} />
-                          </IconButton>
-                        </>
-                      )}
+                    <div style={{ display: 'flex' }}>
+                      <div class="left">
+                        <TokenSymbol symbol="BSHARE" />
+                      </div>
+                      <div class="right">
+                        <h5>BOMB-BTCB</h5>
+                        <p>Recommended</p>
+                        <p>TVL :</p>
+                        <p>Daily returns :</p>
+                        <p>Your stake :</p>
+                        <p>Earned :</p>
+                        <Button>Deposit</Button>
+                        <Button>Withdraw</Button>
+                        <Button>Claim rewards</Button>
+                      </div>
                     </div>
-                    <div className="withdraw">
-                      <Button
-                        disabled={stakedBalance.eq(0) || (!canWithdraw && !canClaimReward)}
-                        onClick={onRedeem}
-                        className={
-                          stakedBalance.eq(0) || (!canWithdraw && !canClaimReward)
-                            ? 'shinyButtonDisabledSecondary'
-                            : 'shinyButtonSecondary'
-                        }
-                      >
-                        Withdraw
-                      </Button>
-                    </div>
-                    <div className="claim">
-                      <Button
-                        onClick={onReward}
-                        className={earnings.eq(0) || !canClaimReward ? 'shinyButtonDisabled' : 'shinyButton'}
-                        disabled={earnings.eq(0) || !canClaimReward}
-                      >
-                        Claim Reward
-                      </Button>
+                    <div style={{ display: 'flex' }}>
+                      <div class="left">
+                        <TokenSymbol symbol="BSHARE" />
+                      </div> 
+                      <div class="right">
+                        <h5>BSHARE-BNB</h5>
+                        <p>Recommended</p>
+                        {/*  yha rehta */}
+                        <p>TVL :</p>
+                        <p>Daily returns :</p>
+                        <p>Your stake :</p>
+                        <p>Earned :</p>
+                        <Button>Deposit</Button>
+                        <Button>Withdraw</Button>
+                        <Button>Claim rewards</Button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -419,66 +497,18 @@ const Home = () => {
               </CardContent>
             </Card>
           </Grid>
+          </>
         ) : (
-          <UnlockWallet />
+          <></>
         )}
 
-        {/* BSHARE */}
-
-        {!!account?(<Grid item xs={12} sm={12}>
-          <Card>
-            <CardContent align="center" style={{ position: 'relative' }}>
-              <div style={{ display: 'flex' }}>
-                <div class="left">
-                  <TokenSymbol symbol="BSHARE" />
-                </div>
-                <div class="right">
-                  <h3>Board Farms</h3>
-                  <p>Stake your LP tokens in our farms to start earning $BSHARE</p>
-                  <Button>Claim all</Button>
-                  {/*  yha rehta */}
-                  <hr />
-                  <div style={{ display: 'flex' }}>
-                    <div class="left">
-                      <TokenSymbol symbol="BSHARE" />
-                    </div>
-                    <div class="right">
-                      <h5>BOMB-BTCB</h5>
-                      <p>Recommended</p>
-                      <p>TVL :</p>
-                      <p>Daily returns :</p>
-                      <p>Your stake :</p>
-                      <p>Earned :</p>
-                      <Button>Deposit</Button>
-                      <Button>Withdraw</Button>
-                      <Button>Claim rewards</Button>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex' }}>
-                    <div class="left">
-                      <TokenSymbol symbol="BSHARE" />
-                    </div>
-                    <div class="right">
-                      <h5>BSHARE-BNB</h5>
-                      <p>Recommended</p>
-                      {/*  yha rehta */}
-                      <p>TVL :</p>
-                      <p>Daily returns :</p>
-                      <p>Your stake :</p>
-                      <p>Earned :</p>
-                      <Button>Deposit</Button>
-                      <Button>Withdraw</Button>
-                      <Button>Claim rewards</Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <hr />
-            </CardContent>
-          </Card>
-        </Grid>):(<></>)}
-
-          {!!account?(<><Bond/></>):(<></>)}
+        {!!account ? (
+          <>
+            <Bond />
+          </>
+        ) : (
+          <></>
+        )}
       </Grid>
     </Page>
   );
