@@ -71,6 +71,20 @@ const FarmCard = ({ bank }) => {
   const {onStake} = useStake(bank);
   const {onZap} = useZap(bank);
   const {onWithdraw} = useWithdraw(bank);
+  const earnings = useEarnings(bank.contract, bank.earnTokenName, bank.poolId);
+  const {onReward} = useHarvest(bank);
+  const bombStats = useBombStats();
+  const tShareStats = useShareStats();
+
+  const tokenName = bank.earnTokenName === 'BSHARE' ? 'BSHARE' : 'BOMB';
+  const tokenStats = bank.earnTokenName === 'BSHARE' ? tShareStats : bombStats;
+  const tokenPriceInDollars = useMemo(
+    () => (tokenStats ? Number(tokenStats.priceInDollars).toFixed(2) : null),
+    [tokenStats],
+  );
+  const earnedInDollars = (Number(tokenPriceInDollars) * Number(getDisplayBalance(earnings))).toFixed(2);
+  
+  
   const [onPresentDeposit, onDismissDeposit] = useModal(
     <DepositModal
       max={tokenBalance}
@@ -145,13 +159,11 @@ const FarmCard = ({ bank }) => {
               <p>TVL : {statsOnPool?.TVL}</p>
               <p>Daily Returns : {bank.closedForStaking ? '0.00' : statsOnPool?.dailyAPR}</p>
               <p>Your stake : ${earnedInDollars2}</p>
-              <p>Earned : </p>
-              <Button className="shinyButtonSecondary" component={Link} to={`/farm/${bank.contract}`}>
-                  View
-              </Button>
+              <p>Earned : ${earnedInDollars}</p>
+              
               </>
           ) : (
-              <UnlockWallet />
+              <></>
           )}
         </CardActions>
       </Card>
