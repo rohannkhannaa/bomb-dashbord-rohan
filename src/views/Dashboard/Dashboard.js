@@ -326,7 +326,7 @@ const Home = () => {
                     TVL: <span style={{ color: 'rgba(0, 232, 162, 1)' }}>${TVL}</span>{' '}
                   </p>
                   <p>
-                    Last Epoch TWAP:<span>{}</span>{' '}
+                    Last Epoch TWAP: <span style={{ color: 'rgba(0, 232, 162, 1)' }}>{bondScale}</span>{' '}
                   </p>
                 </div>
               </div>
@@ -485,6 +485,7 @@ const Home = () => {
               <Card>
                 <CardContent style={{ position: 'relative' }}>
                   <h2>BOMB FARMS</h2>
+                  <p>Stake your LP tokens in our farms to start earning $BSHARE</p>
                   <hr />
 
                   <Grid container spacing={3} style={{ marginTop: '20px' }}>
