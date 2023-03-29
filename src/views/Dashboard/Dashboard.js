@@ -2,7 +2,8 @@
 // Rohan
 // IIT Ropar Btech CSE
 // Entry Number : 2020CSB1117
-import './Dashboard.css';
+import './css/Dashboard.css';
+import {ReactComponent as IconDiscord} from '../../assets/img/discord.svg';
 import useTotalValueLocked from '../../hooks/useTotalValueLocked';
 import React, { useMemo } from 'react';
 import styled from 'styled-components';
@@ -46,8 +47,6 @@ import IconButton from '../../components/IconButton';
 import useApprove, { ApprovalState } from '../../hooks/useApprove';
 import useTokenBalance from '../../hooks/useTokenBalance';
 import useWithdrawCheck from '../../hooks/boardroom/useWithdrawCheck';
-import Label from '../../components/Label';
-import Value from '../../components/Value';
 import useRedeemOnBoardroom from '../../hooks/useRedeemOnBoardroom';
 import useClaimRewardCheck from '../../hooks/boardroom/useClaimRewardCheck';
 import useHarvestFromBoardroom from '../../hooks/useHarvestFromBoardroom';
@@ -72,12 +71,6 @@ const TITLE = 'bomb.money | BTC pegged algocoin';
 // `;
 
 const Home = () => {
-  function handleClickDiscord() {
-    window.location.href = 'https://discord.bomb.money';
-  }
-  function handleClickReadDocs() {
-    window.location.href = 'https://docs.bomb.money/welcome-start-here/readme';
-  }
   const bombStats = useBombStats();
   const bShareStats = usebShareStats();
   const tBondStats = useBondStats();
@@ -168,7 +161,7 @@ const Home = () => {
   const totalStaked = useTotalStakedOnBoardroom();
   const { account } = useWallet();
   const bombFinance = useBombFinance();
-  const [approveStatus, approve] = useApprove(bombFinance.  BSHARE, bombFinance.contracts.Boardroom.address);
+  const [approveStatus, approve] = useApprove(bombFinance.BSHARE, bombFinance.contracts.Boardroom.address);
   const tokenBalance = useTokenBalance(bombFinance.BSHARE);
   const stakedBalance = useStakedBalanceOnBoardroom();
   const stakedTokenPriceInDollars = useStakedTokenPriceInDollars('BSHARE', bombFinance.BSHARE);
@@ -223,7 +216,7 @@ const Home = () => {
   );
   const boardroomAPR = useFetchBoardroomAPR();
   const tBondPriceInBNB = useMemo(() => (tBondStats ? Number(tBondStats.tokenInFtm).toFixed(4) : null), [tBondStats]);
-    const TVL = useTotalValueLocked();
+  const TVL = useTotalValueLocked();
   return (
     <Page>
       <Helmet>
@@ -253,7 +246,14 @@ const Home = () => {
                     </thead>
                     <tbody>
                       <tr style={{ borderTop: '1px solid #ddd' }}>
-                        <td style={{alignContent:'center' , padding: '10px', borderBottom: '1px solid #ddd', verticalAlign: 'center' }}>
+                        <td
+                          style={{
+                            alignContent: 'center',
+                            padding: '10px',
+                            borderBottom: '1px solid #ddd',
+                            verticalAlign: 'center',
+                          }}
+                        >
                           <TokenSymbol symbol="BOMB" />
                           <p style={{ display: 'inline', verticalAlign: 'center' }}>$BOMB</p>
                         </td>
@@ -265,7 +265,8 @@ const Home = () => {
                         </td>
                         <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
                           ${bombPriceInDollars ? roundAndFormatNumber(bombPriceInDollars, 2) : '-.--'}
-                          <br />{bombPriceInBNB ? bombPriceInBNB : '-.----'} BTC
+                          <br />
+                          {bombPriceInBNB ? bombPriceInBNB : '-.----'} BTC
                         </td>
                       </tr>
                       <tr style={{ borderTop: '1px solid #ddd' }}>
@@ -280,8 +281,8 @@ const Home = () => {
                           {roundAndFormatNumber(bShareCirculatingSupply, 2)}
                         </td>
                         <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
-                        ${bSharePriceInDollars ? bSharePriceInDollars : '-.--'}
-                          <br/>
+                          ${bSharePriceInDollars ? bSharePriceInDollars : '-.--'}
+                          <br />
                           {bSharePriceInBNB ? bSharePriceInBNB : '-.----'} BNB
                         </td>
                       </tr>
@@ -297,10 +298,10 @@ const Home = () => {
                           {roundAndFormatNumber(tBondCirculatingSupply, 2)}
                         </td>
                         <td style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
-                        ${tBondPriceInDollars ? tBondPriceInDollars : '-.--'}
-                        <br/>
+                          ${tBondPriceInDollars ? tBondPriceInDollars : '-.--'}
+                          <br />
                           {tBondPriceInBNB ? tBondPriceInBNB : '-.----'} BTC
-                        <br/>
+                          <br />
                         </td>
                       </tr>
                     </tbody>
@@ -318,132 +319,164 @@ const Home = () => {
                   </p>
                   <p style={{ fontSize: 'large', margin: '2px' }}>Next EPOCH in</p>
                   <hr />
-                  <p>Live TWAP: <span style= {{color : 'rgba(0, 232, 162, 1)'}}>{bondScale}</span></p>
-                  <p>TVL: <span style={{color : 'rgba(0, 232, 162, 1)'}}>${TVL}</span> </p>
-                  <p>Last Epoch TWAP:<span>{}</span> </p>
+                  <p>
+                    Live TWAP: <span style={{ color: 'rgba(0, 232, 162, 1)' }}>{bondScale}</span>
+                  </p>
+                  <p>
+                    TVL: <span style={{ color: 'rgba(0, 232, 162, 1)' }}>${TVL}</span>{' '}
+                  </p>
+                  <p>
+                    Last Epoch TWAP:<span>{}</span>{' '}
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={4} style={{ width: '25%', height: '3%' }}>
-          <Card>
-            <CardContent align="center" style={{ display: 'flex', flexDirection: 'column', padding: '0' }}>
-              <p
-                style={{
-                  flex: 1,
-                  width: '100%',
-                  background:
-                    'radial-gradient(59345.13% 4094144349.28% at 39511.5% -2722397851.45%, rgba(0, 245, 171, 0.5) 0%, rgba(0, 173, 232, 0.5) 100%)',
-                  margin: '0',
-                }}
-              >
-                INVEST NOW
-              </p>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <button onClick={handleClickDiscord} style={{ flex: 1, width: '100%', backgroundColor: 'grey' }}>
-                  Chat on Discord
-                </button>
-                <button onClick={handleClickReadDocs} style={{ flex: 1, width: '100%', backgroundColor: 'grey' }}>
-                  Read docs
-                </button>
-              </div>
-            </CardContent>
-          </Card>
-        </Grid>
 
         {!!account ? (
-          <Grid item xs={12} sm={12}>
-            <Card>
-              <CardContent align="center" style={{ position: 'relative' }}>
-                <div style={{ display: 'flex' }}>
-                  <div class="left">
-                    <TokenSymbol symbol="BSHARE" />
-                  </div>
-                  <div class="right">
-                    <h3 style={{ display: 'inline' }}>Board room . . . . </h3>
-                    <p style={{ background: 'rgba(0, 232, 162, 0.5)', borderRadius: '3px', display: 'inline' }}>
-                      {' '}
-                      Recommened
-                    </p>
-                    <hr />
-                    <p>Stake BSHARE and earn BOMB every epoch</p>
-                    {/*  yha rehta */}
-                    <p>TVL :{TVL}</p>
-                    <p>Total staked: {getDisplayBalance(totalStaked)}</p>
-                    <hr />
-                    <p>Daily returns :</p>
-                    {boardroomAPR.toFixed(2) / 365}%
-                    <p>
-                      <hr/>
-                      Your stake :
-                      <Value value={getDisplayBalance(stakedBalance)} />
-                      <Label text={`≈ $${tokenPriceInDollars}`} variant="yellow" />
-                      <Label text={'BSHARE Staked'} variant="yellow" />
-                    </p>
-                    <hr/>
-                    <p>
-                      Earned :
-                      <Value value={getDisplayBalance(earnings)} />
-                      <Label text={`≈ $${earnedInDollars}`} variant="yellow" />
-                      <Label text="BOMB Earned" variant="yellow" />
-                    </p>
-                    <div class="Deposit">
-                      {approveStatus !== ApprovalState.APPROVED ? (
-                        <Button
-                          disabled={approveStatus !== ApprovalState.NOT_APPROVED}
-                          className={
-                            approveStatus === ApprovalState.NOT_APPROVED ? 'shinyButton' : 'shinyButtonDisabled'
-                          }
-                          style={{ marginTop: '20px' }}
-                          onClick={approve}
-                        >
-                          Deposit
-                        </Button>
-                      ) : (
-                        <>
-                          <IconButton disabled={!canWithdrawFromBoardroom} onClick={onPresentWithdraw}>
-                            <RemoveIcon color={!canWithdrawFromBoardroom ? '' : 'yellow'} />
-                          </IconButton>
-                          <StyledActionSpacer />
-                          <IconButton onClick={onPresentDeposit}>
-                            <AddIcon color={!canWithdrawFromBoardroom ? '' : 'yellow'} />
-                          </IconButton>
-                        </>
-                      )}
-                    </div>
-                    <div className="withdraw">
-                      <Button
-                        disabled={stakedBalance.eq(0) || (!canWithdraw && !canClaimReward)}
-                        onClick={onRedeem}
-                        className={
-                          stakedBalance.eq(0) || (!canWithdraw && !canClaimReward)
-                            ? 'shinyButtonDisabledSecondary'
-                            : 'shinyButtonSecondary'
-                        }
-                      >
-                        Withdraw
-                      </Button>
-                    </div>
-                    <div className="claim">
-                      <Button
-                        onClick={onReward}
-                        className={earnings.eq(0) || !canClaimReward ? 'shinyButtonDisabled' : 'shinyButton'}
-                        disabled={earnings.eq(0) || !canClaimReward}
-                      >
-                        Claim Reward
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-                <hr />
-              </CardContent>
-            </Card>
-          </Grid>
+           <Grid item xs={12} sm={8}>
+           <div style={{ textAlign: 'right', margin: '5px' }}>
+             <a href="https://bombbshare.medium.com/the-bomb-cycle-how-to-print-forever-e89dc82c12e5" target="__blank" style={{ textDecoration: 'underline', color: 'white' }}>
+               Read Investment Strategy &gt;
+             </a>
+           </div>
+ 
+           <Button href="" className="blueButton" style={{ margin: '5px', width: '98%', backgroundColor : '#4eacea' }}>
+             Invest Now
+           </Button>
+           <Button
+             href="https://discord.bomb.money"
+             rel="noopener noreferrer"
+             target="_blank"
+             className="shinyButton"
+             style={{ margin: '7px', width: '48%' }}
+           >
+             Chat on Discord <IconDiscord style={{fill: '#dddfee', height: '20px'}} />
+           </Button>
+           <Button
+             href="https://docs.bomb.money"
+             rel="noopener noreferrer"
+             target="_blank"
+             className="shinyButton"
+             style={{ margin: '8px', width: '48%' }}
+           >
+             Read Docs
+           </Button>
+           <Card>
+             <CardContent align="center" style={{ position: 'relative' }}>
+               <h2 style={{ textAlign: 'left', margin: '5px', paddingRight: '10px' }}>
+               <TokenSymbol symbol="BSHARE"/> Boardroom
+                 <button className="recButton" style={{ alignContent: 'center', marginLeft: '15px', backgroundColor: '#'}}>
+                   Recommended
+                 </button>
+               </h2>
+               <div className="conthalf">
+                 <span>Stake BSHARE and earn BOMB every epoch</span>
+                 <br/>
+                 <span>TVL: ${roundAndFormatNumber(TVL, 20)}</span>
+               </div>
+               <hr></hr>
+               <div style={{ textAlign: 'right' }}>Total Staked : {roundAndFormatNumber(getDisplayBalance(totalStaked), 2)}</div>
+               <br></br>
+ 
+               <div className="conthalf">   
+                 <span>
+                   <table class="table table-bordered table-dark">
+                     <thead>
+                       <tr>
+                         <th scope="col">Daily Returns:</th>
+                         <th scope="col">Your Stake</th>
+                         <th scope="col">Earned:</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       <tr>
+                         <td style={{ fontSize: '30px', textAlign: 'center' }}>{roundAndFormatNumber(boardroomAPR.toFixed(2) / 365, 2)}%</td>
+                         <td style={{ textAlign: 'center' }}>{getDisplayBalance(stakedBalance)}</td>
+                         <td style={{ textAlign: 'center' }}>{getDisplayBalance(earnings)}</td>
+                       </tr>
+                       <tr>
+                         <td></td>
+                         <td style={{ textAlign: 'center' }}>${tokenPriceInDollars}</td>
+                         <td style={{ textAlign: 'center' }}>${earnedInDollars}</td>
+                       </tr>
+                     </tbody>
+                   </table>
+                 </span>
+                 <span>
+                   {approveStatus !== ApprovalState.APPROVED ? (
+                         <Button
+                           disabled={approveStatus !== ApprovalState.NOT_APPROVED}
+                           className={
+                             approveStatus === ApprovalState.NOT_APPROVED ? 'shinyButton' : 'shinyButtonDisabled'
+                           }
+                           onClick={approve}
+                         >
+                           Deposit
+                         </Button>
+                       ) : (
+                         <>
+                           <IconButton disabled={!canWithdrawFromBoardroom} onClick={onPresentWithdraw}>
+                             <RemoveIcon color={!canWithdrawFromBoardroom ? '' : 'yellow'} />
+                           </IconButton>
+                           <StyledActionSpacer />
+                           <IconButton onClick={onPresentDeposit}>
+                             <AddIcon color={!canWithdrawFromBoardroom ? '' : 'yellow'} />
+                           </IconButton>
+                         </>
+                       )}
+                   <Button
+                         disabled={stakedBalance.eq(0) || (!canWithdraw && !canClaimReward)}
+                         onClick={onRedeem}
+                         className={
+                           stakedBalance.eq(0) || (!canWithdraw && !canClaimReward)
+                             ? 'shinyButtonDisabledSecondary'
+                             : 'shinyButtonSecondary'
+                         }
+                       >
+                         Withdraw
+                       </Button>
+                   <Button
+                         onClick={onReward}
+                         className={earnings.eq(0) || !canClaimReward ? 'shinyButtonDisabled' : 'shinyButton'}
+                         disabled={earnings.eq(0) || !canClaimReward}
+                       >
+                         Claim Reward
+                       </Button>
+                 </span>
+               </div>
+             </CardContent>
+           </Card>
+         </Grid>
         ) : (
-          <UnlockWallet />
+          <UnlockWallet/>
         )}
+       
+        <Grid item xs={12} sm={4}>
+          <Card>
+            <CardContent align="center">
+              <h3>Latest News</h3>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+              <br></br>
+            </CardContent>
+          </Card>
+        </Grid>
 
         {/* Details only shown after account Login, else user asked to connect wallet first */}
         {!!account ? (
@@ -453,7 +486,7 @@ const Home = () => {
                 <CardContent style={{ position: 'relative' }}>
                   <h2>BOMB FARMS</h2>
                   <hr />
-                  
+
                   <Grid container spacing={3} style={{ marginTop: '20px' }}>
                     {activeBanks
                       .filter((bank) => bank.sectionInUI === 3)

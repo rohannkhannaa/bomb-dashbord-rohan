@@ -5,7 +5,6 @@ import { AddIcon, RemoveIcon } from '../../components/icons';
 import FlashOnIcon from '@material-ui/icons/FlashOn';
 import IconButton from '../../components/IconButton';
 import TokenSymbol from '../../components/TokenSymbol';
-import { useWallet } from 'use-wallet';
 import useStatsForPool from '../../hooks/useStatsForPool';
 import useRedeem from '../../hooks/useRedeem';
 import useEarnings from '../../hooks/useEarnings';
@@ -26,7 +25,6 @@ import useStake from '../../hooks/useStake';
 import useZap from '../../hooks/useZap';
 import './css/FarmCard.css';
 const FarmCard = ({ bank }) => {
-  const { account } = useWallet();
   let depositToken = bank.depositTokenName.toUpperCase();
   if (depositToken === '80BOMB-20BTCB-LP') {
     depositToken = 'BOMB-MAXI';
@@ -107,44 +105,63 @@ const FarmCard = ({ bank }) => {
   );
 
   return (
-    <Grid item xs={12} md={12} lg={12}>
-      <Card variant="outlined">
-        <CardContent>
-          <Box style={{ position: 'relative' }}>
-            <Box
-              style={{
-                position: 'absolute',
-                right: '0px',
-                top: '-5px',
-                height: '48px',
-                width: '48px',
-                borderRadius: '40px',
-                backgroundColor: '#363746',
-                alignItems: 'center',
-                display: 'flex',
-              }}
-            >
-              <TokenSymbol size={32} symbol={bank.depositTokenName} />
-            </Box>
-            <Typography variant="h5" component="h2" style={{ display: 'inline', marginRight: '2rem' }}>
-              {bank.depositTokenName}
-            </Typography>
-            <p style={{ background: 'rgba(0, 232, 162, 0.5)', borderRadius: '3px', display: 'inline' }}> Recommened</p>
-            <Typography color="textSecondary">
-              {/* {bank.name} */}
-              Deposit {depositToken.toUpperCase()} Earn {` ${bank.earnTokenName}`}
-            </Typography>
-          </Box>
-        </CardContent>
-        <CardActions style={{ justifyContent: 'flex-end' }}>
-          {!!account ? (
-            <>
-              <p className="boardRoomContent">TVL<br/>{statsOnPool?.TVL}</p>
+    <>
+      {/* Since BBOND is also in activeBanks but it is not to be included in recommended section of bomb farms so removed it. */}
+      {bank.depositTokenName === 'BBOND' ? (
+        <></>
+      ) : (
+        <Grid item xs={12} md={12} lg={12}>
+          <Card variant="outlined">
+            <CardContent>
+              <Box style={{ position: 'relative' }}>
+                <Box
+                  style={{
+                    position: 'absolute',
+                    right: '0px',
+                    top: '-5px',
+                    height: '48px',
+                    width: '48px',
+                    borderRadius: '40px',
+                    backgroundColor: '#363746',
+                    alignItems: 'center',
+                    display: 'flex',
+                  }}
+                ></Box>
+                <div className="parent" style={{ justifyContent: 'space-between' }}>
+                  <div className="left child1">
+                    <Typography variant="h5" component="h2" style={{ display: 'inline', marginRight: '2rem' }}>
+                      <TokenSymbol size={32} symbol={bank.depositTokenName} />
+                      {bank.depositTokenName}
+                    </Typography>
+                    <p style={{ background: 'rgba(0, 232, 162, 0.5)', borderRadius: '3px', display: 'inline' }}>
+                      {' '}
+                      Recommended
+                    </p>
+                    <Typography color="textSecondary">
+                      {/* {bank.name} */}
+                      <hr />
+                    </Typography>
+                  </div>
+                  <div className="right child2">
+                    <p className="boardRoomContent">TVL : {statsOnPool?.TVL}</p>
+                  </div>
+                </div>
+              </Box>
+            </CardContent>
+            <CardActions style={{ justifyContent: 'flex-end' }}>
               <p className="boardRoomContent">
-                Daily Returns<br/>{bank.closedForStaking ? '0.00' : statsOnPool?.dailyAPR}
+                Daily Returns
+                <br />
+                {bank.closedForStaking ? '0.00' : statsOnPool?.dailyAPR}
               </p>
-              <p className="boardRoomContent">Your stake<br/>${earnedInDollars2}</p>
-              <p className="boardRoomContent">Earned<br/>${earnedInDollars}</p>
+              <p className="boardRoomContent">
+                Your stake
+                <br />${earnedInDollars2}
+              </p>
+              <p className="boardRoomContent">
+                Earned
+                <br />${earnedInDollars}
+              </p>
               {/* Deposit button */}
               <div className="deposit">
                 {approveStatus !== ApprovalState.APPROVED ? (
@@ -162,7 +179,6 @@ const FarmCard = ({ bank }) => {
                         ? 'shinyButtonDisabled'
                         : 'shinyButton'
                     }
-                    style={{ marginTop: '20px' }}
                   >
                     {`Deposit`}
                   </Button>
@@ -215,15 +231,11 @@ const FarmCard = ({ bank }) => {
                   Claim
                 </Button>
               </div>
-              <br/>
-              <hr/>
-            </>
-          ) : (
-            <></>
-          )}
-        </CardActions>
-      </Card>
-    </Grid>
+            </CardActions>
+          </Card>
+        </Grid>
+      )}
+    </>
   );
 };
 

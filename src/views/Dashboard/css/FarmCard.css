@@ -1,3 +1,30 @@
 .boardRoomContent:not(:last-child) {
     margin-right: 4rem; /* adjust the value as needed */
 } 
+.parent {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .child1 {
+    flex: 1 1 auto;
+  }
+  
+  .child2 {
+    flex: 1 1 auto;
+  }
+  
+  @media only screen and (max-width: 600px) {
+    .parent {
+      flex-wrap: nowrap;
+      flex-direction: column;
+    }
+  }
+  
+  /* Styles for mobile devices */
+  @media (max-width: 480px) {
+    .child1 {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }

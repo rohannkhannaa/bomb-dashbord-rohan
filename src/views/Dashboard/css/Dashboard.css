@@ -1,0 +1,89 @@
+.parent {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .child1 {
+    flex: 1 1 auto;
+  }
+  
+  .child2 {
+    flex: 1 1 auto;
+  }
+  
+  @media only screen and (max-width: 600px) {
+    .parent {
+      flex-wrap: nowrap;
+      flex-direction: column;
+    }
+  }
+  
+  table {
+    width: 100%;
+  }
+  
+  /* Styles for mobile devices */
+  @media (max-width: 480px) {
+    .child1 {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
+  .simpleButtons {
+    margin-top: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background: #171923;
+    border: 2px solid black;
+    border-color: white;
+    color: white;
+
+    border-radius: 15px;
+    font-size: 1rem !important;
+    padding-left: 5px;
+}
+
+.simpleButtons:hover {
+    cursor: pointer;
+    background-color: #4d5371;
+}
+
+.column {
+    flex: 33.33%;
+    height: 100%;
+    padding: 10px;
+    margin: 5px;
+    text-align: center;
+}
+
+.contain {
+    display: flex;
+}
+
+.recButton {
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 4px;
+    background-color: #13bb97;
+    color: white;
+}
+
+.blueButton {
+    margin-top: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+    border-radius: 15px;
+    font-size: 1rem !important;
+    font-weight: bold !important;
+    padding-left: 5px;
+    background-color: #4eacea !important;
+    color: white;
+    box-shadow: 0px 0px 5px 0px #71b7e6;
+}
+
+.blueButton:hover {
+    background: #82bec3 !important;
+    color: #171923;
+}

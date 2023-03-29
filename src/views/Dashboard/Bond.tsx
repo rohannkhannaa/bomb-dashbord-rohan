@@ -9,13 +9,14 @@ import useTokenBalance from '../../hooks/useTokenBalance';
 import useBondsPurchasable from '../../hooks/useBondsPurchasable';
 import { getDisplayBalance } from '../../utils/formatBalance';
 import { BOND_REDEEM_PRICE, BOND_REDEEM_PRICE_BN } from '../../bomb-finance/constants';
+import ExchangeStat from '../Bond/components/ExchangeStat';
 import TokenSymbol from '../../components/TokenSymbol';
-
 import { Grid, Card, CardContent, Button } from '@material-ui/core';
 
 
 
 const Bond: React.FC = () => {
+  const tBondStats = useBondStats();
   const bombFinance = useBombFinance();
   const addTransaction = useTransactionAdder();
   const bondStat = useBondStats();
@@ -51,25 +52,45 @@ const Bond: React.FC = () => {
 
   return (
     <>
-      <Grid item xs={12} sm={12}>
-        <Card>
-          <CardContent style={{ position: 'inherit' }}>
-            <div style={{ display: 'flex' }}>
-              <div className="left">
-                <TokenSymbol symbol="BSHARE" />
+      <Grid item xs={12} sm={12} style={{ paddingTop: '10px' }}>
+          <Card style={{ height: '100%' }}>
+            <CardContent style={{ marginTop: '1%' }}>
+
+              <div className="conthalf">
+                <span>
+                  <h2 style={{ textAlign: 'left', margin: '5px', paddingRight: '10px' }}>
+                  <TokenSymbol symbol="BBOND" />{' '} Bonds
+                  </h2>
+                  <p style={{ marginTop: '0px', marginLeft: '5px' }}>BBOND can be purchased only on contraction periods, when TWAP of BOMB is below 1</p>
+                </span>
               </div>
-              <div className="right">
-                <h3>Bonds</h3>
-                <p>BBOND can be purchased only on contraction periods, when TWAP of BOMB is below 1</p>
-                {/*  yha rehta */}
-                <p>Current Price = (BOMB)^2</p>
-                <p>BBond ={Number(bondStat?.tokenInFtm).toFixed(4) || '-'} BTC</p>
-                <p>Available to redeem :{`${getDisplayBalance(bondBalance)} BBOND Available in wallet`}</p>
-                <hr />
-                <div className="purchase">
-                  {!isBondPurchasable ? (
+
+              <div className="contain">
+                <div className="column">
+                  <p style={{ fontSize: '13px' }}>Current Price: (Bomb)^2</p>
+                  <p style={{ fontSize: '23px', fontWeight: 'bold' }}>
+                    <ExchangeStat
+                    description= ""
+                      tokenName="10,000 BBOND"
+                      price={Number(tBondStats?.tokenInFtm).toFixed(4) || '-'}
+                    />
+                  </p>
+                </div>
+                <div className="column">
+                  <p style={{ fontSize: '13px' }}>Available to redeem:</p>
+                  <p style={{ fontSize: '23px', fontWeight: 'bold' }}>${getDisplayBalance(bondBalance)}</p>
+                </div>
+                <div className="column">
+                  <div className="conthalf" >
+                    <span>
+                      <p style={{ fontWeight: 'bold', marginBottom: '1px' }}>Purchase BBond</p>
+                      {!isBondPurchasable ? (
+                        <p>Bomb is over peg</p>
+                      ): (<></>)}
+                    </span>
+                    <span>
+                    {!isBondPurchasable ? (
                     <>
-                      <p>Bomb is Over Peg</p>
                       <Button disabled>Purchase</Button>
                     </>
                   ) : (
@@ -90,9 +111,16 @@ const Bond: React.FC = () => {
                       />
                     </>
                   )}
-                </div>
-                <div className="redeem">
-                  <ExchangeCard
+                    </span>
+                  </div>
+                  <hr></hr>
+
+                  <div className="conthalf" >
+                    <span>
+                      <p style={{ fontWeight: 'bold', marginBottom: '1px' }}>Redeem Bomb</p>
+                    </span>
+                    <span>
+                    <ExchangeCard
                     action="Redeem"
                     fromToken={bombFinance.BBOND}
                     fromTokenName="BBOND"
@@ -105,15 +133,14 @@ const Bond: React.FC = () => {
                       !isBondRedeemable ? `Redeem Enabled when 10,000 BOMB > ${BOND_REDEEM_PRICE}BTC` : null
                     }
                   />
+                    </span>
+                  </div>
                 </div>
-                <hr />
-                <div className="redeem"></div>
               </div>
-            </div>
-            <hr />
-          </CardContent>
-        </Card>
-      </Grid>
+
+            </CardContent>
+          </Card>
+        </Grid>
     </>
   );
 };
