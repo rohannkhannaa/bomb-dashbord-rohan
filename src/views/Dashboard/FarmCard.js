@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useContext } from 'react';
 import styled, { ThemeContext } from 'styled-components';
 import { Box, Button, Card, CardActions, CardContent, Typography, Grid } from '@material-ui/core';
 import { AddIcon, RemoveIcon } from '../../components/icons';
+import { useWallet } from 'use-wallet';
 import FlashOnIcon from '@material-ui/icons/FlashOn';
 import IconButton from '../../components/IconButton';
 import TokenSymbol from '../../components/TokenSymbol';
@@ -23,8 +24,11 @@ import ZapModal from './ZapModal';
 import useModal from '../../hooks/useModal';
 import useStake from '../../hooks/useStake';
 import useZap from '../../hooks/useZap';
+
 import './css/FarmCard.css';
+import UnlockWallet from '../../components/UnlockWallet';
 const FarmCard = ({ bank }) => {
+  const { account } = useWallet();
   let depositToken = bank.depositTokenName.toUpperCase();
   if (depositToken === '80BOMB-20BTCB-LP') {
     depositToken = 'BOMB-MAXI';
@@ -163,7 +167,8 @@ const FarmCard = ({ bank }) => {
                 <br />${earnedInDollars}
               </p>
               {/* Deposit button */}
-              <div className="deposit">
+              { !!account ?
+              (<><div className="deposit">
                 {approveStatus !== ApprovalState.APPROVED ? (
                   <Button
                     disabled={
@@ -231,6 +236,8 @@ const FarmCard = ({ bank }) => {
                   Claim
                 </Button>
               </div>
+              </>
+              ) : (<><UnlockWallet/></>)}
             </CardActions>
           </Card>
         </Grid>

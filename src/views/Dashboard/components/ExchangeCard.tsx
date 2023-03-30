@@ -14,6 +14,7 @@ import useTokenBalance from '../../../hooks/useTokenBalance';
 import useApprove, {ApprovalState} from '../../../hooks/useApprove';
 import useCatchError from '../../../hooks/useCatchError';
 import { useWallet } from "use-wallet";
+import UnlockWallet from '../../../components/UnlockWallet';
 
 interface ExchangeCardProps {
   action: string;
@@ -85,7 +86,7 @@ const ExchangeCard: React.FC<ExchangeCardProps> = ({
               )}
               </>
             ) : (
-              <></>
+              <><UnlockWallet/></>
             )}
           </StyledCardActions>
         </StyledCardContentInner>
