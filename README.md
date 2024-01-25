@@ -1,7 +1,6 @@
 # 🪦Welcome to the Bomb.money ecosystem🪦
 
-Thanks for taking the time to contribute!
-You can start by reading our [Contribution guidelines](CONTRIBUTING.md) first.
+It was a part of assignment, I worked on the dashboard page only. But I got a decent experience of Typesript.
 
 ## Setup
 
